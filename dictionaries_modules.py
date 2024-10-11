@@ -1,0 +1,10 @@
+angles_polarization={
+    "Rec":{0:0,1:90},
+    "Dia":{0:45,1:135}
+}
+decode_angles={
+    0:{"Rec":0,"Dia":"N/A"},
+    45:{"Rec":"N/A","Dia":0},
+    90:{"Rec":1,"Dia":"N/A"},
+    135:{"Rec":"N/A","Dia":1}
+}
