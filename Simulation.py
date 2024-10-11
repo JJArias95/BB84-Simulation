@@ -681,7 +681,7 @@ class grafica(wx.Frame):
             self.axes[i].cla()
 
         self.simulation_1()
-        self.Ejercicio2()
+        self.simulation_2()
         self.Ejercicio3()
         self.Ejercicio4()
         self.Ejercicio5()
