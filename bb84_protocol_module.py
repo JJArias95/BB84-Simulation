@@ -1,15 +1,13 @@
-from random import *
+import random 
 from dictionaries_modules import *
 import numpy as np
-import random
-#####################################################
-######################## QKD ########################
-#####################################################
+
+######## Generation of the raw key ########
 def raw_key(numbits):
     return [random.choice([0,1]) for i in range(numbits)]
 
 ######## Generation of the bases ########
-def random_base(numbases):
+def random_bases(numbases):
     return [random.choice(["Rec","Dia"]) for i in range(numbases)]
 
 def encode(bits,bases):
@@ -23,6 +21,8 @@ def decode(angles,bases):
         else:
             bits.append(decode_angles[angles[i]][bases[i]])
     return bits
+
+
 ############################################
 ########## Error Diferentes a Eve ##########
 ############################################
@@ -57,6 +57,13 @@ def depolarization(PolState,ProbDesPol=0.1,sen="-"):
 ############################################
 ################ Sifting ###################
 ############################################
+
+# Recordar que el Qber solo se saca con los bits con bases que 
+# concuerdan y el Ber se saca con el total de los bits de la Rawkey
+# En realidad el Qber y el Ber se saca de forma muy parecido con la 
+# diferencia de que el Qber es el Ber calculado con los bits de la base
+# que coincide.
+
 def ber(Abits,Bbits):
     BerAux=0
     bits=len(Abits)
@@ -65,6 +72,7 @@ def ber(Abits,Bbits):
             BerAux+=1
     BER=float(BerAux/bits)
     return BER
+
 
 def qber(Abits,Bbits,Abases,Bbases):
     QberAux=0
@@ -78,6 +86,9 @@ def qber(Abits,Bbits,Abases,Bbases):
     QBER=float(QberAux/base)
     return QBER
 
+
+
+#this select only the bits that its bases agree
 def bit_agree(Bits,ABases,BBases):
     NumBits=len(Bits)
     BitsAgree=[]
@@ -85,6 +96,12 @@ def bit_agree(Bits,ABases,BBases):
         if ABases[i]==BBases[i]:
             BitsAgree.append(Bits[i])
     return BitsAgree
+
+
+# El A es la key despues de haber separado los bits de las bases que 
+# agree de la funcion bit agree y el b es el porcentaje de bits de 
+# esa key que se quiere usar para hallar el Qber. Esta funcion toma 
+# de forma aleatoria len(A)*b de los bits donde la bases concuerdan
 
 def index_random(lensiftbits,fractionbits):
     NumIndex=int(np.ceil(lensiftbits*fractionbits))
@@ -97,6 +114,7 @@ def index_random(lensiftbits,fractionbits):
     index.sort() 
     return index
 
+
 def sel_bit_random(SiftingKey,Index):
     return [SiftingKey[l] for l in Index]
 
@@ -107,7 +125,7 @@ def remove_bit(siftingkey,index):
         if not j in index:
             key.append(siftingkey[j])
     return key
-
+    
 def bits_qber_selector(Asiftingkey,Bsiftingkey,perc):
     lenA=len(Asiftingkey)
     LenUnCoveredbits=int(np.ceil(perc*lenA))
@@ -130,7 +148,6 @@ def bits_qber_selector(Asiftingkey,Bsiftingkey,perc):
             AFinalKey.append(Asiftingkey[k])
             BFinalKey.append(Bsiftingkey[k])
 
-    
     Qber=QberAux/len(index)
     return Qber,AFinalKey,BFinalKey
 
