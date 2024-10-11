@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 import wx
-import matplotlib
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigCanvas
 import numpy as np
 import pylab
 import random
-from datetime import datetime
 import os
 import shutil
 from bb84_protocol_module import *
@@ -17,26 +15,26 @@ class grafica(wx.Frame):
     def __init__(self,):
         wx.Frame.__init__(self, None, -1, self.title, size=(400,400))
         
-        ## Ejercicio 1 ## 
+        ## Simulation_1 ## 
         self.NumSimSim1=500
         self.NumBitsSim1=600
         self.XSim1 = np.linspace(0,self.NumBitsSim1-1,num=self.NumBitsSim1)
         #################
 
-        ## Ejercicio 2 ## 
+        ## Simulation_2 ## 
         self.lon22=600
         self.lon32=500
         self.hisX2 = np.linspace(0,self.lon22-1,num=self.lon22)
         #################
 
-        ## Ejercicio 3 ## 
+        ## Simulation_3 ## 
         self.lon23=600
         self.lon33=500
 
         self.hisX0 = np.linspace(0,self.lon23-1,num=self.lon23)
         #################
 
-        ## Ejercicio 4 ## 
+        ## Simulation_4 ## 
         self.lon24=1000
         self.lon34=3
         self.lambdaa4=1 # Probabilidad de que aparezca Eve en la señal 
@@ -59,7 +57,7 @@ class grafica(wx.Frame):
         self.QberT4=25*self.lambdaa4+50*self.a4
         #################
 
-        ## Ejercicio 5 ## 
+        ## Simulation_5 ## 
         self.lon25=9000
         self.lon35=3
         self.lambdaa5=0 # Probabilidad de que aparezca Eve en la señal 
@@ -75,7 +73,7 @@ class grafica(wx.Frame):
 
         #################
 
-        ## Ejercicio 6 ## 
+        ## Simulation_6 ## 
         self.lon26=200
         self.lon36=100
         self.a6=0
@@ -90,7 +88,7 @@ class grafica(wx.Frame):
         self.QberT6=25*self.x6+50*self.a6
         #################
 
-        ## Ejercicio 7 ## 
+        ## Simulation_7 ## 
         self.lon27=200
         self.lon37=100
         self.ML73=[]
@@ -495,6 +493,7 @@ class grafica(wx.Frame):
 
     def create_menu(self):
         self.menubar = wx.MenuBar()
+
         menu_file = wx.Menu()
         m_expt = menu_file.Append(-1, "&Save plot\tCtrl-S", "Save plot to file")
         self.Bind(wx.EVT_MENU, self.on_save_plot, m_expt)
@@ -734,7 +733,7 @@ class grafica(wx.Frame):
         self.axes[14].plot(self.x6,self.ML64,'r')
 
         self.Dibujo12= self.axes[15].plot_surface(
-            self.X,self.Y,self.Z7,cmap='hot',antialiased=False,alpha=0.6) # https://matplotlib.org/mpl_toolkits/mplot3d/tutorial.html
+            self.X,self.Y,self.Z7,cmap='hot',antialiased=False,alpha=0.6) 
         self.figs[15].colorbar(self.Dibujo12, shrink=0.5, aspect=5.5)
         
         self.Dibujo13= self.axes[16].plot_surface(
