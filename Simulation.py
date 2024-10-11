@@ -495,7 +495,6 @@ class grafica(wx.Frame):
 
     def create_menu(self):
         self.menubar = wx.MenuBar()
-        
         menu_file = wx.Menu()
         m_expt = menu_file.Append(-1, "&Save plot\tCtrl-S", "Save plot to file")
         self.Bind(wx.EVT_MENU, self.on_save_plot, m_expt)
