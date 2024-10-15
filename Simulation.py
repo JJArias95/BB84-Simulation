@@ -15,16 +15,18 @@ class grafica(wx.Frame):
     def __init__(self,):
         wx.Frame.__init__(self, None, -1, self.title, size=(400,400))
         
-        ## Simulation_1 ## 
-        self.NumSimSim1=500
-        self.NumBitsSim1=600
+        ## Simulation 1 ## 
+        self.NumSimSim1=500 ## Number of simulations
+        self.NumBitsSim1=600 ## Number of bits per simulation 
+        ## x-axis for the simulation 1 
         self.XSim1 = np.linspace(0,self.NumBitsSim1-1,num=self.NumBitsSim1)
         #################
 
-        ## Simulation_2 ## 
-        self.lon22=600
-        self.lon32=500
-        self.hisX2 = np.linspace(0,self.lon22-1,num=self.lon22)
+        ## Simulation 2 ## 
+        self.NumSimSim2=500 ## Number of simulations
+        self.NumBitsSim2=600 ## Number of bits per simulation
+        ## x-axis for the simulation 2  
+        self.XSim2 = np.linspace(0,self.NumBitsSim2-1,num=self.NumBitsSim2)
         #################
 
         ## Simulation_3 ## 
@@ -133,51 +135,53 @@ class grafica(wx.Frame):
     ##              is 50%.
 
     def simulation_1(self):
-        RecIndexesSim1=[]
-        DiaIndexesSim1=[]
-        OnesIndexesSim1=[]
-        ZerosIndexesSim1=[]
+        RecIndexes=[]
+        DiaIndexes=[]
+        OnesIndexes=[]
+        ZerosIndexes=[]
         print("Simulation 1-start")
         for i in range(self.NumSimSim1):
             RawKey=raw_key(self.NumBitsSim1) 
             RanBases=random_bases(self.NumBitsSim1)
             for j in range(self.NumBitsSim1):
-                (OnesIndexesSim1 if RawKey[j] == 1 else ZerosIndexesSim1).append(j)
-                (RecIndexesSim1 if RanBases[j] == "Rec" else DiaIndexesSim1).append(j)
+                (OnesIndexes if RawKey[j] == 1 
+                 else ZerosIndexes).append(j)
+                (RecIndexes if RanBases[j] == "Rec" 
+                 else DiaIndexes).append(j)
             
-        self.HistOnesSim1, BinEdgeOnesSim1 = np.histogram(OnesIndexesSim1,bins = range(self.NumBitsSim1+1))
-        self.HistZerosSim1, BinEdgeZerosSim1 = np.histogram(ZerosIndexesSim1,bins = range(self.NumBitsSim1+1))
-        self.HistRecSim1, BinEdgeRecSim1 = np.histogram(RecIndexesSim1,bins = range(0,self.NumBitsSim1+1))
-        self.HistDiaSim1, BinEdgeDiaSim1 = np.histogram(DiaIndexesSim1,bins = range(0,self.NumBitsSim1+1))
+        self.HistOnesSim1,Bin1 = np.histogram(OnesIndexes,
+                                              bins=range(self.NumBitsSim1+1))
+        self.HistZerosSim1,Bin2= np.histogram(ZerosIndexes,
+                                              bins=range(self.NumBitsSim1+1))
+        self.HistRecSim1,Bin3 = np.histogram(RecIndexes,
+                                             bins=range(0,self.NumBitsSim1+1))
+        self.HistDiaSim1,Bin4= np.histogram(DiaIndexes,
+                                            bins=range(0,self.NumBitsSim1+1))
         print("Simulation 1-end\n")
 
-    ## Simulation 2: Calculation if approximately 50% of the bases agree 
-    ##               (Agree), the other approximately 50% of the bases 
-    ##               do not agree.
+    ## Simulation 2: Distribution of the agree bases and the disagree bases 
+    ##               in the RanBases list bewteen Alice Bases and Bob bases.
+    ##               The theoretical value is 50%.
     def simulation_2(self):
         print("Simulation 2-start")
         wf1=[]
+        AgreeBasesIndexSim2=[]
+        DisagreeBaseseIndexSim2=[]
+        RecIndexesSim1
         wf2=[]
 
-        for i in range(0,self.lon32):
-            M=random_bases(self.lon22)## Alice Bases
-            R=random_bases(self.lon22)## Bob Bases
+        for i in range(self.NumSimSim2):
+            M=random_bases(self.NumBitsSim2)## Alice Bases
+            R=random_bases(self.NumBitsSim2)## Bob Bases
 
-            for j in range(0,self.lon22):
+            for j in range(0,self.NumBitsSim2):
                 if M[j]==R[j]:
                     wf1.append(j)
                 else:
                     wf2.append(j)
 
-        self.hist22, self.bin_edge22 = np.histogram(wf1,bins = range(0,self.lon22+1))
-        self.hist32, self.bin_edge32 = np.histogram(wf2,bins = range(0,self.lon22+1))
-
-        ##Valor Teorico
-        point12 = [0, 50]
-        point22 = [self.lon22, 50]
-
-        self.x_values21= [point12[0], point22[0]]
-        self.y_values21= [point12[1], point22[1]]
+        self.hist22, Bin1 = np.histogram(wf1,bins = range(0,self.NumBitsSim2+1))
+        self.hist32, Bin2 = np.histogram(wf2,bins = range(0,self.NumBitsSim2+1))
         print("Simulation 2-end\n")
 
 
@@ -686,6 +690,7 @@ class grafica(wx.Frame):
         self.Ejercicio6()
         self.Ejercicio7()
 
+        #Simulation 1
         self.axes[0].plot(
             self.XSim1,self.HistOnesSim1*100*((self.NumSimSim1)**(-1)),'r',
             self.XSim1,self.HistZerosSim1*100*((self.NumSimSim1)**(-1)),'b',
@@ -696,16 +701,22 @@ class grafica(wx.Frame):
             self.XSim1,self.HistDiaSim1*100*((self.NumSimSim1)**(-1)),'b',
             self.XSim1,(self.HistRecSim1+self.HistDiaSim1)*100*((self.NumSimSim1)**(-1)),'y',
             [0, self.NumBitsSim1],[50,50],'limegreen')
+        
+        #Simulation 2
         self.axes[2].plot(
             self.hisX2,self.hist22*100*((self.lon32)**(-1)),'r',
             self.hisX2,self.hist32*100*((self.lon32)**(-1)),'b',
-            self.x_values21,self.y_values21,'limegreen',
-            self.hisX2,((self.hist22+self.hist32)*100*((self.lon32)**(-1))),'y')
+            self.hisX2,((self.hist22+self.hist32)*100*((self.lon32)**(-1))),'y',
+            [0, self.NumBitsSim2],[50,50],'limegreen')
+        
+        #Simulation 3
         self.axes[3].plot(
             self.hisX0,self.hist0*100*((self.lon33)**(-1)),'r',
             self.hisX0,self.hist90*100*((self.lon33)**(-1)),'b',
             self.x_values31,self.y_values31,'limegreen',
             self.hisX0,((self.hist0+self.hist45+self.hist90+self.hist135)*100*((self.lon33)**(-1))),'y')
+        
+        #Simulation 3
         self.axes[4].plot(
             self.hisX0,self.hist45*100*((self.lon33)**(-1)),'r',
             self.hisX0,self.hist135*100*((self.lon33)**(-1)),'b',
