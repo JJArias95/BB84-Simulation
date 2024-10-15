@@ -164,24 +164,23 @@ class grafica(wx.Frame):
     ##               The theoretical value is 50%.
     def simulation_2(self):
         print("Simulation 2-start")
-        wf1=[]
-        AgreeBasesIndexSim2=[]
-        DisagreeBaseseIndexSim2=[]
-        RecIndexesSim1
-        wf2=[]
+        AgreeBasesIndex=[]
+        DisagreeBasesIndex=[]
 
         for i in range(self.NumSimSim2):
-            M=random_bases(self.NumBitsSim2)## Alice Bases
-            R=random_bases(self.NumBitsSim2)## Bob Bases
+            AliceBases=random_bases(self.NumBitsSim2)
+            BobBases=random_bases(self.NumBitsSim2)## Bob Bases
 
-            for j in range(0,self.NumBitsSim2):
-                if M[j]==R[j]:
-                    wf1.append(j)
+            for j in range(self.NumBitsSim2):
+                if AliceBases[j]==BobBases[j]:
+                    AgreeBasesIndex.append(j)
                 else:
-                    wf2.append(j)
-
-        self.hist22, Bin1 = np.histogram(wf1,bins = range(0,self.NumBitsSim2+1))
-        self.hist32, Bin2 = np.histogram(wf2,bins = range(0,self.NumBitsSim2+1))
+                    DisagreeBasesIndex.append(j)
+        
+        self.HistAgreeBasesSim2, Bin1 = np.histogram(AgreeBasesIndex,
+                                         bins = range(0,self.NumBitsSim2+1))
+        self.HistDisagreeBasesSim2, Bin2 = np.histogram(DisagreeBasesIndex,
+                                         bins = range(0,self.NumBitsSim2+1))
         print("Simulation 2-end\n")
 
 
@@ -704,9 +703,9 @@ class grafica(wx.Frame):
         
         #Simulation 2
         self.axes[2].plot(
-            self.hisX2,self.hist22*100*((self.lon32)**(-1)),'r',
-            self.hisX2,self.hist32*100*((self.lon32)**(-1)),'b',
-            self.hisX2,((self.hist22+self.hist32)*100*((self.lon32)**(-1))),'y',
+            self.XSim2,self.HistAgreeBasesSim2*100*((self.NumSimSim2)**(-1)),'r',
+            self.XSim2,self.HistDisagreeBasesSim2*100*((self.NumSimSim2)**(-1)),'b',
+            self.XSim2,((self.HistAgreeBasesSim2+self.HistDisagreeBasesSim2)*100*((self.NumSimSim2)**(-1))),'y',
             [0, self.NumBitsSim2],[50,50],'limegreen')
         
         #Simulation 3
@@ -715,13 +714,13 @@ class grafica(wx.Frame):
             self.hisX0,self.hist90*100*((self.lon33)**(-1)),'b',
             self.x_values31,self.y_values31,'limegreen',
             self.hisX0,((self.hist0+self.hist45+self.hist90+self.hist135)*100*((self.lon33)**(-1))),'y')
-        
-        #Simulation 3
         self.axes[4].plot(
             self.hisX0,self.hist45*100*((self.lon33)**(-1)),'r',
             self.hisX0,self.hist135*100*((self.lon33)**(-1)),'b',
             self.x_values31,self.y_values31,'limegreen',
             self.hisX0,((self.hist0+self.hist45+self.hist90+self.hist135)*100*((self.lon33)**(-1))),'y')
+        
+        #Simulation 4
         self.axes[5].plot(
             np.array(self.x4),self.ML4,'r',
             self.x_values41,self.y_values41,'limegreen')
@@ -734,15 +733,20 @@ class grafica(wx.Frame):
         self.axes[9].bar(self.hisX4,self.hist42,facecolor='#FF0000')
         self.axes[9].plot(self.x_values44,self.y_values44,'limegreen')
         self.axes[10].plot(self.XSTD42,self.STD42,'r')
+
+        #Simulation 5
         self.axes[11].plot(
             self.x5,self.ML53,'r',
             self.x5,self.QberT5,'limegreen')
         self.axes[12].plot(
             self.x5,self.ML54,'r',
             self.x5,self.BerT5,'limegreen')
+        
+        #Simulation 6
         self.axes[13].plot(self.x6,self.ML63,'r')
         self.axes[14].plot(self.x6,self.ML64,'r')
 
+        #Simulation 7
         self.Dibujo12= self.axes[15].plot_surface(
             self.X,self.Y,self.Z7,cmap='hot',antialiased=False,alpha=0.6) 
         self.figs[15].colorbar(self.Dibujo12, shrink=0.5, aspect=5.5)
@@ -765,7 +769,7 @@ class grafica(wx.Frame):
 
 
         self.axes[1].set_xlabel("Posicion de la base", fontsize=16)
-        self.axes[1].set_xlim(left=0, right=self.lon22)
+        self.axes[1].set_xlim(left=0, right=self.NumBitsSim2)
         #
         self.axes[1].set_ylabel("Probabilidad (%)", fontsize=16)
         self.axes[1].set_ylim(top=101, bottom=0)
@@ -776,7 +780,7 @@ class grafica(wx.Frame):
 
 
         self.axes[2].set_xlabel("Posicion de la base", fontsize=16)
-        self.axes[2].set_xlim(left=0, right=self.lon22)
+        self.axes[2].set_xlim(left=0, right=self.NumBitsSim2)
         #
         self.axes[2].set_ylabel("Probabilidad (%)", fontsize=16)
         self.axes[2].set_ylim(top=101, bottom=0)
