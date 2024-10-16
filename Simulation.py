@@ -22,16 +22,9 @@ class grafica(wx.Frame):
         self.XSim1 = np.linspace(0,self.NumBitsSim1-1,num=self.NumBitsSim1)
         #################
 
-        ## Simulation 2 ## 
-        self.NumSimSim2=500 ## Number of simulations
-        self.NumBitsSim2=600 ## Number of bits per simulation
-        ## x-axis for the simulation 2  
-        self.XSim2 = np.linspace(0,self.NumBitsSim2-1,num=self.NumBitsSim2)
-        #################
-
         ## Simulation_3 ## 
-        self.lon23=600
         self.lon33=500
+        self.lon23=600
 
         self.hisX0 = np.linspace(0,self.lon23-1,num=self.lon23)
         #################
@@ -131,57 +124,70 @@ class grafica(wx.Frame):
         self.create_main_panel()
 
     ## Simulation 1:Distribution of the bits and bases in the RawKey list 
-    ##              and the RanBases list, respectively.The theoretical value 
-    ##              is 50%.
+    ##              and the RanBases list, respectively.
+    ##              Distribution of the agree bases and the disagree bases 
+    ##              in the RanBases list bewteen Alice Bases and Bob bases.
+    ##              The theoretical value is 50%.
 
     def simulation_1(self):
         RecIndexes=[]
         DiaIndexes=[]
         OnesIndexes=[]
         ZerosIndexes=[]
+        AgreeBasesIndex=[]
+        DisagreeBasesIndex=[]
         print("Simulation 1-start")
         for i in range(self.NumSimSim1):
             RawKey=raw_key(self.NumBitsSim1) 
             RanBases=random_bases(self.NumBitsSim1)
+            AliceBases=random_bases(self.NumBitsSim1)
+            BobBases=random_bases(self.NumBitsSim1)
+            
             for j in range(self.NumBitsSim1):
                 (OnesIndexes if RawKey[j] == 1 
                  else ZerosIndexes).append(j)
-                (RecIndexes if RanBases[j] == "Rec" 
+                (RecIndexes if AliceBases[j] == "Rec" 
                  else DiaIndexes).append(j)
+                (AgreeBasesIndex if AliceBases[j]==BobBases[j] 
+                 else DisagreeBasesIndex).append(j)
+                
             
         self.HistOnesSim1,Bin1 = np.histogram(OnesIndexes,
                                               bins=range(self.NumBitsSim1+1))
         self.HistZerosSim1,Bin2= np.histogram(ZerosIndexes,
                                               bins=range(self.NumBitsSim1+1))
         self.HistRecSim1,Bin3 = np.histogram(RecIndexes,
-                                             bins=range(0,self.NumBitsSim1+1))
+                                             bins=range(self.NumBitsSim1+1))
         self.HistDiaSim1,Bin4= np.histogram(DiaIndexes,
-                                            bins=range(0,self.NumBitsSim1+1))
+                                            bins=range(self.NumBitsSim1+1))
+        self.HistAgreeBasesSim1, Bin5 = np.histogram(AgreeBasesIndex,
+                                         bins = range(self.NumBitsSim1+1))
+        self.HistDisagreeBasesSim1, Bin5 = np.histogram(DisagreeBasesIndex,
+                                         bins = range(self.NumBitsSim1+1))
         print("Simulation 1-end\n")
 
-    ## Simulation 2: Distribution of the agree bases and the disagree bases 
-    ##               in the RanBases list bewteen Alice Bases and Bob bases.
-    ##               The theoretical value is 50%.
-    def simulation_2(self):
-        print("Simulation 2-start")
-        AgreeBasesIndex=[]
-        DisagreeBasesIndex=[]
+    # ## Simulation 2: 
+    # ##               The theoretical value is 50%.
+    # def simulation_2(self):
+    #     print("Simulation 2-start")
+    #     AgreeBasesIndex=[]
+    #     DisagreeBasesIndex=[]
 
-        for i in range(self.NumSimSim2):
-            AliceBases=random_bases(self.NumBitsSim2)
-            BobBases=random_bases(self.NumBitsSim2)## Bob Bases
+    #     for i in range(self.NumSimSim2):
+    #         AliceBases=random_bases(self.NumBitsSim2)
+    #         BobBases=random_bases(self.NumBitsSim2)
 
-            for j in range(self.NumBitsSim2):
-                if AliceBases[j]==BobBases[j]:
-                    AgreeBasesIndex.append(j)
-                else:
-                    DisagreeBasesIndex.append(j)
+    #         for j in range(self.NumBitsSim2):
+    #             if AliceBases[j]==BobBases[j]:
+    #                 AgreeBasesIndex.append(j)
+    #             else:
+    #                 DisagreeBasesIndex.append(j)
         
-        self.HistAgreeBasesSim2, Bin1 = np.histogram(AgreeBasesIndex,
-                                         bins = range(0,self.NumBitsSim2+1))
-        self.HistDisagreeBasesSim2, Bin2 = np.histogram(DisagreeBasesIndex,
-                                         bins = range(0,self.NumBitsSim2+1))
-        print("Simulation 2-end\n")
+    #     self.HistAgreeBasesSim2, Bin1 = np.histogram(AgreeBasesIndex,
+    #                                      bins = range(0,self.NumBitsSim2+1))
+    #     self.HistDisagreeBasesSim2, Bin2 = np.histogram(DisagreeBasesIndex,
+    #                                      bins = range(0,self.NumBitsSim2+1))
+    #     print("Simulation 2-end\n")
 
 
     ## Observar que si se cumple que aproximadamente el 25% de los angulos estan compuesto por 0, otro 25% por 45, otro 25% por 90 y otro 25% por 135 
@@ -682,7 +688,6 @@ class grafica(wx.Frame):
             self.axes[i].cla()
 
         self.simulation_1()
-        self.simulation_2()
         self.Ejercicio3()
         self.Ejercicio4()
         self.Ejercicio5()
@@ -700,13 +705,11 @@ class grafica(wx.Frame):
             self.XSim1,self.HistDiaSim1*100*((self.NumSimSim1)**(-1)),'b',
             self.XSim1,(self.HistRecSim1+self.HistDiaSim1)*100*((self.NumSimSim1)**(-1)),'y',
             [0, self.NumBitsSim1],[50,50],'limegreen')
-        
-        #Simulation 2
         self.axes[2].plot(
-            self.XSim2,self.HistAgreeBasesSim2*100*((self.NumSimSim2)**(-1)),'r',
-            self.XSim2,self.HistDisagreeBasesSim2*100*((self.NumSimSim2)**(-1)),'b',
-            self.XSim2,((self.HistAgreeBasesSim2+self.HistDisagreeBasesSim2)*100*((self.NumSimSim2)**(-1))),'y',
-            [0, self.NumBitsSim2],[50,50],'limegreen')
+            self.XSim1,self.HistAgreeBasesSim1*100*((self.NumSimSim1)**(-1)),'r',
+            self.XSim1,self.HistDisagreeBasesSim1*100*((self.NumSimSim1)**(-1)),'b',
+            self.XSim1,((self.HistAgreeBasesSim1+self.HistDisagreeBasesSim1)*100*((self.NumSimSim1)**(-1))),'y',
+            [0, self.NumBitsSim1],[50,50],'limegreen')
         
         #Simulation 3
         self.axes[3].plot(
@@ -769,7 +772,7 @@ class grafica(wx.Frame):
 
 
         self.axes[1].set_xlabel("Posicion de la base", fontsize=16)
-        self.axes[1].set_xlim(left=0, right=self.NumBitsSim2)
+        self.axes[1].set_xlim(left=0, right=self.NumBitsSim1)
         #
         self.axes[1].set_ylabel("Probabilidad (%)", fontsize=16)
         self.axes[1].set_ylim(top=101, bottom=0)
@@ -780,7 +783,7 @@ class grafica(wx.Frame):
 
 
         self.axes[2].set_xlabel("Posicion de la base", fontsize=16)
-        self.axes[2].set_xlim(left=0, right=self.NumBitsSim2)
+        self.axes[2].set_xlim(left=0, right=self.NumBitsSim1)
         #
         self.axes[2].set_ylabel("Probabilidad (%)", fontsize=16)
         self.axes[2].set_ylim(top=101, bottom=0)
