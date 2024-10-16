@@ -139,7 +139,6 @@ class grafica(wx.Frame):
         print("Simulation 1-start")
         for i in range(self.NumSimSim1):
             RawKey=raw_key(self.NumBitsSim1) 
-            RanBases=random_bases(self.NumBitsSim1)
             AliceBases=random_bases(self.NumBitsSim1)
             BobBases=random_bases(self.NumBitsSim1)
             
@@ -162,33 +161,9 @@ class grafica(wx.Frame):
                                             bins=range(self.NumBitsSim1+1))
         self.HistAgreeBasesSim1, Bin5 = np.histogram(AgreeBasesIndex,
                                          bins = range(self.NumBitsSim1+1))
-        self.HistDisagreeBasesSim1, Bin5 = np.histogram(DisagreeBasesIndex,
+        self.HistDisagreeBasesSim1, Bin6 = np.histogram(DisagreeBasesIndex,
                                          bins = range(self.NumBitsSim1+1))
         print("Simulation 1-end\n")
-
-    # ## Simulation 2: 
-    # ##               The theoretical value is 50%.
-    # def simulation_2(self):
-    #     print("Simulation 2-start")
-    #     AgreeBasesIndex=[]
-    #     DisagreeBasesIndex=[]
-
-    #     for i in range(self.NumSimSim2):
-    #         AliceBases=random_bases(self.NumBitsSim2)
-    #         BobBases=random_bases(self.NumBitsSim2)
-
-    #         for j in range(self.NumBitsSim2):
-    #             if AliceBases[j]==BobBases[j]:
-    #                 AgreeBasesIndex.append(j)
-    #             else:
-    #                 DisagreeBasesIndex.append(j)
-        
-    #     self.HistAgreeBasesSim2, Bin1 = np.histogram(AgreeBasesIndex,
-    #                                      bins = range(0,self.NumBitsSim2+1))
-    #     self.HistDisagreeBasesSim2, Bin2 = np.histogram(DisagreeBasesIndex,
-    #                                      bins = range(0,self.NumBitsSim2+1))
-    #     print("Simulation 2-end\n")
-
 
     ## Observar que si se cumple que aproximadamente el 25% de los angulos estan compuesto por 0, otro 25% por 45, otro 25% por 90 y otro 25% por 135 
     def Ejercicio3(self):
@@ -539,13 +514,6 @@ class grafica(wx.Frame):
             file.write("Number of simulations: "+str(self.NumSimSim1)+"\n")
 
             file.write("\n=========================\n")
-            file.write("Ejercicio 2: Observar que si se cumple que aproximadamente el 50% de las bases concuerdan (Agree) y\n")
-            file.write("y el otro aproximadamente 50% de las bases no concuerdan\n")
-            file.write("=========================\n\n")
-            file.write("Longuitud de la Rawkey: "+str(self.lon22)+"\n")
-            file.write("Número de repeticiones: "+str(self.lon32)+"\n")
-
-            file.write("\n=========================\n")
             file.write("Ejercicio 3: Observar que si se cumple que aproximadamente el 25% de los angulos estan compuesto por 0,\n")
             file.write("otro 25% por 45, otro 25% por 90 y otro 25% por 135\n")
             file.write("=========================\n\n")
@@ -628,12 +596,9 @@ class grafica(wx.Frame):
 
         modal.Destroy()
 
-        
-
     def on_exit(self, event):
         for i in range(17):
             pylab.close(self.figs[i]) 
-
         self.Destroy()
 
     def create_main_panel(self):
@@ -641,12 +606,9 @@ class grafica(wx.Frame):
         self.st = wx.Button(self.panel, id = 1, label ="Button", pos =(1000, 600), size =(100, 40),  name ="button")
         
         self.Vbox=wx.BoxSizer(wx.VERTICAL) 
-
         ######
-
         self.figs=[]
         self.axes=[]
-
         for i in range(17):
             if i<15:
                 auxfigs,auxaxes=pylab.subplots(1)
@@ -662,22 +624,14 @@ class grafica(wx.Frame):
         self.canvas=[]
         for i in range(17):
             self.canvas.append(FigCanvas(self.nb, -1, self.figs[i]))
-
-        ####
-        for i in range(17):
             self.nb.AddPage(self.canvas[i], self.NamePlots[i])
 
         #### 
-
         self.Vbox.Add(self.nb,0,wx.ALL,0)
-
         self.mainbox = wx.BoxSizer(wx.VERTICAL)
-
         self.mainbox.Add(self.Vbox,0,wx.ALL,0)
-
         self.panel.SetSizer(self.mainbox)
         self.mainbox.Fit(self)
-
         self.init_plot()
         #######################
 
@@ -758,240 +712,196 @@ class grafica(wx.Frame):
             self.X2,self.Y2,self.Z72,  cmap='hot',antialiased=False, rstride=1, cstride=1, alpha=0.6)
         self.figs[16].colorbar(self.Dibujo13, shrink=0.5, aspect=5.5)
 
-        # # ### Para mejorar las graficas   
-        # # #
-        self.axes[0].set_xlabel("Posicion del bit", fontsize=16)
-        self.axes[0].set_xlim(left=0, right=self.NumBitsSim1)
-        #
-        self.axes[0].set_ylabel("Probabilidad (%)", fontsize=16)
-        self.axes[0].set_ylim(top=101, bottom=0)
-        #
-        self.axes[0].tick_params( axis = 'both', which ='major', labelsize = 14)
+        ### To customize the plots
+        ### Simulation 1
+        self.axes[0].set_title("Distribution of ones and zeros in the raw" \
+                               "key", fontsize=16)
+        self.axes[0].set_xlabel("Posicion del bit",fontsize=16)
+        self.axes[0].set_xlim(left=0,right=self.NumBitsSim1)
+        self.axes[0].set_ylabel("Probabilidad (%)",fontsize=16)
+        self.axes[0].set_ylim(top=101,bottom=0)
+        self.axes[0].tick_params(axis='both',which='major',labelsize=14)
+        self.axes[0].legend(["One","Zero","Theoretical","Total"],
+                            loc='best',fontsize=13)
         self.axes[0].set_facecolor('black')
-        self.axes[0].grid(True, color='gray')
+        self.axes[0].grid(True,color='gray')
 
-
-        self.axes[1].set_xlabel("Posicion de la base", fontsize=16)
-        self.axes[1].set_xlim(left=0, right=self.NumBitsSim1)
-        #
-        self.axes[1].set_ylabel("Probabilidad (%)", fontsize=16)
-        self.axes[1].set_ylim(top=101, bottom=0)
-        #
-        self.axes[1].tick_params( axis = 'both', which ='major', labelsize = 14)
+        self.axes[1].set_title("Distribution of conjugate bases in the bases"\
+                               "list", fontsize=16)
+        self.axes[1].set_xlabel("Posicion de la base",fontsize=16)
+        self.axes[1].set_xlim(left=0,right=self.NumBitsSim1)
+        self.axes[1].set_ylabel("Probabilidad (%)",fontsize=16)
+        self.axes[1].set_ylim(top=101,bottom=0)
+        self.axes[1].tick_params(axis='both',which='major',labelsize=14)
+        self.axes[1].legend(["Rectilinear", "Diagonal","Theoretical","Total"],
+                            loc= 'best', fontsize=13)
         self.axes[1].set_facecolor('black')
         self.axes[1].grid(True, color='gray')
 
-
-        self.axes[2].set_xlabel("Posicion de la base", fontsize=16)
-        self.axes[2].set_xlim(left=0, right=self.NumBitsSim1)
-        #
-        self.axes[2].set_ylabel("Probabilidad (%)", fontsize=16)
-        self.axes[2].set_ylim(top=101, bottom=0)
-        #
-        self.axes[2].tick_params( axis = 'both', which ='major', labelsize = 14)
+        self.axes[2].set_title("Distribution of the agree bases and the" \
+                               "disagree bases in the bases list",fontsize=16)
+        self.axes[2].set_xlabel("Posicion de la base",fontsize=16)
+        self.axes[2].set_xlim(left=0,right=self.NumBitsSim1)
+        self.axes[2].set_ylabel("Probabilidad (%)",fontsize=16)
+        self.axes[2].set_ylim(top=101,bottom=0)
+        self.axes[2].tick_params(axis='both',which ='major',labelsize=14)
+        self.axes[2].legend(["Agree", "Disagree", "Theoretical","Total"],
+                            loc= 'best', fontsize=13)
         self.axes[2].set_facecolor('black')
         self.axes[2].grid(True, color='gray')
 
-
-        self.axes[3].set_xlabel("Posicion del Qbit", fontsize=16)
+        ### Simulation 3
+        self.axes[3].set_title("Distribution of states |H⟩ and |45⟩ in the" \
+                               "raw key",fontsize=16)
+        self.axes[3].set_xlabel("Posicion del Qbit",fontsize=16)
         self.axes[3].set_xlim(left=0, right=self.lon23)
-        #
-        self.axes[3].set_ylabel("Probabilidad (%)", fontsize=16)
-        self.axes[3].set_ylim(top=101, bottom=0)
-        #
-        self.axes[3].tick_params( axis = 'both', which ='major', labelsize = 14)
+        self.axes[3].set_ylabel("Probabilidad (%)",fontsize=16)
+        self.axes[3].set_ylim(top=101,bottom=0)
+        self.axes[3].tick_params(axis='both',which='major',labelsize=14)
+        self.axes[3].legend(["0","90","Theoretical","0+45+90+135"],
+                            loc= 'best', fontsize=13)
         self.axes[3].set_facecolor('black')
-        self.axes[3].grid(True, color='gray')
+        self.axes[3].grid(True,color='gray')
 
-
-        self.axes[4].set_xlabel("Posicion del Qbit", fontsize=16)
-        self.axes[4].set_xlim(left=0, right=self.lon23)
-        #
-        self.axes[4].set_ylabel("Probabilidad (%)", fontsize=16)
-        self.axes[4].set_ylim(top=101, bottom=0)
-        #
+        self.axes[4].set_title("Distribution of states |V⟩ and |135⟩ in the" \
+                               "raw key", fontsize=16)
+        self.axes[4].set_xlabel("Posicion del Qbit",fontsize=16)
+        self.axes[4].set_xlim(left=0,right=self.lon23)
+        self.axes[4].set_ylabel("Probabilidad (%)",fontsize=16)
+        self.axes[4].set_ylim(top=101,bottom=0)
         self.axes[4].set_facecolor('black')
-        self.axes[4].tick_params( axis = 'both', which ='major', labelsize = 14)
-        self.axes[4].grid(True, color='gray')
+        self.axes[4].tick_params(axis='both',which ='major',labelsize=14)
+        self.axes[4].legend(["45","135","Theoretical","0+45+90+135"],
+                            loc= 'best', fontsize=13)
+        self.axes[4].grid(True,color='gray')
 
-
+        ### Simulation 4
+        self.axes[5].set_title("Dependence of Qber on the length of raw key"
+                                "for"+r'$\alpha$'+"="+str(self.a4)+" and "
+                                +r'$\lambda$'+"="+str(self.lambdaa4), 
+                                fontsize=16)
         self.axes[5].set_xlabel("Longuitud de la RawKey", fontsize=16)
         self.axes[5].set_xlim(left=0, right=self.lon24)
-        #
-        self.axes[5].set_ylabel("Qber", fontsize=16)
-        self.axes[5].set_ylim(top=101, bottom=0)
-        #
-        self.axes[5].tick_params(axis = 'both', which ='major', labelsize = 14)
+        self.axes[5].set_ylabel("Qber",fontsize=16)
+        self.axes[5].set_ylim(top=101,bottom=0)
+        self.axes[5].tick_params(axis='both',which='major',labelsize=14)
+        self.axes[5].legend(["Simulation","Theoretical"],loc='best',fontsize=13)
         self.axes[5].set_facecolor('black')
-        self.axes[5].grid(True, color='gray')
+        self.axes[5].grid(True,color='gray')
 
-
-        self.axes[6].set_xlabel("Qber", fontsize=16)
-        self.axes[6].set_xlim(left=10, right=40)
-        #
-        self.axes[6].set_ylabel("Numero de occurrencias", fontsize=16)
-        self.axes[6].set_ylim(top=self.L, bottom=0)
-        #
-        self.axes[6].tick_params( axis = 'both', which ='major', labelsize = 14)
+        self.axes[6].set_title("Histograma del Qber para "+r'$\alpha$'+"="+str(self.a4)+" y "+r'$\lambda$'+"="+str(self.lambdaa4), fontsize=16)
+        self.axes[6].set_xlabel("Qber",fontsize=16)
+        self.axes[6].set_xlim(left=10,right=40)
+        self.axes[6].set_ylabel("Numero de occurrencias",fontsize=16)
+        self.axes[6].set_ylim(top=self.L,bottom=0)
+        self.axes[6].tick_params(axis='both',which='major',labelsize=14)
+        self.axes[6].legend(["Theoretical","Simulation"],loc='best',fontsize=13)
         self.axes[6].set_facecolor('black')
         self.axes[6].grid(True, color='gray')
 
-
-        self.axes[7].set_xlabel('Numero de grupo', fontsize=16)
+        self.axes[7].set_title("Desviacion estandar del Qber por grupo para "+r'$\alpha$'+"="+str(self.a4)+" y "+r'$\lambda$'+"="+str(self.lambdaa4), fontsize=16)
+        self.axes[7].set_xlabel('Numero de grupo',fontsize=16)
         self.axes[7].set_xlim(left=0, right=(self.lon24*(self.NUM4**-1))+10)
-        #
-        self.axes[7].set_ylabel('Desviacion Estandar', fontsize=16)
-        self.axes[7].set_ylim(top=np.amax(self.STD4)+1, bottom=0)
-        #
-        self.axes[7].tick_params( axis = 'both', which ='major', labelsize = 14)
+        self.axes[7].set_ylabel('Desviacion Estandar',fontsize=16)
+        self.axes[7].set_ylim(top=np.amax(self.STD4)+1,bottom=0)
+        self.axes[7].tick_params( axis = 'both', which ='major',labelsize=14)
+        self.axes[7].legend(["Simulation","Theoretical"],loc='best',fontsize=13)
         self.axes[7].set_facecolor('black')
         self.axes[7].grid(True, color='gray')
 
-
-        self.axes[8].set_xlabel("Longuitud de la RawKey", fontsize=16)
-        self.axes[8].set_xlim(left=0, right=self.lon24)
-        #
-        self.axes[8].set_ylabel("Ber", fontsize=16)
-        self.axes[8].set_ylim(top=101, bottom=0)
-        #
-        self.axes[8].tick_params( axis = 'both', which ='major', labelsize = 14)
+        self.axes[8].set_title("Dependencia del Ber con la longuitud de RawKey para "+r'$\alpha$'+"="+str(self.a4)+" y "+r'$\lambda$'+"="+str(self.lambdaa4), fontsize=16)
+        self.axes[8].set_xlabel("Longuitud de la RawKey",fontsize=16)
+        self.axes[8].set_xlim(left=0,right=self.lon24)
+        self.axes[8].set_ylabel("Ber",fontsize=16)
+        self.axes[8].set_ylim(top=101,bottom=0)
+        self.axes[8].tick_params(axis='both',which ='major',labelsize=14)
+        self.axes[8].legend(["Theoretical","Simulation"],loc='best',fontsize=13)
         self.axes[8].set_facecolor('black')
-        self.axes[8].grid(True, color='gray')
+        self.axes[8].grid(True,color='gray')
 
-
-        self.axes[9].set_xlabel("Ber", fontsize=16)
-        self.axes[9].set_xlim(left=20, right=50)
-        #
-        self.axes[9].set_ylabel("Numero de occurrencias", fontsize=16)
-        self.axes[9].set_ylim(top=self.L2, bottom=0)
-        #
-        self.axes[9].tick_params( axis = 'both', which ='major', labelsize = 14)
+        self.axes[9].set_title("Histograma del Ber para "+r'$\alpha$'+"="+str(self.a4)+" y "+r'$\lambda$'+"="+str(self.lambdaa4), fontsize=16)
+        self.axes[9].set_xlabel("Ber",fontsize=16)
+        self.axes[9].set_xlim(left=20,right=50)
+        self.axes[9].set_ylabel("Numero de occurrencias",fontsize=16)
+        self.axes[9].set_ylim(top=self.L2,bottom=0)
+        self.axes[9].tick_params(axis='both',which='major',labelsize=14)
         self.axes[9].set_facecolor('black')
-        self.axes[9].grid(True, color='gray')
+        self.axes[9].grid(True,color='gray')
 
-
-        self.axes[10].set_xlabel('Numero de grupo', fontsize=16)
+        self.axes[10].set_title("Desviacion estandar del Ber por grupo para "+r'$\alpha$'+"="+str(self.a4)+" y "+r'$\lambda$'+"="+str(self.lambdaa4), fontsize=16)
+        self.axes[10].set_xlabel('Numero de grupo',fontsize=16)
         self.axes[10].set_xlim(left=0, right=(self.lon24*(self.NUM42**-1))+10)
-        #
-        self.axes[10].set_ylabel('Desviacion Estandar', fontsize=16)
-        self.axes[10].set_ylim(top=np.amax(self.STD42)+1, bottom=0)
-        #
-        self.axes[10].tick_params( axis = 'both', which ='major', labelsize = 14)
+        self.axes[10].set_ylabel('Desviacion Estandar',fontsize=16)
+        self.axes[10].set_ylim(top=np.amax(self.STD42)+1,bottom=0)
+        self.axes[10].tick_params(axis='both',which ='major',labelsize=14)
         self.axes[10].set_facecolor('black')
-        self.axes[10].grid(True, color='gray')
+        self.axes[10].grid(True,color='gray')
 
-
-        self.axes[11].set_xlabel(r'$\alpha$', fontsize=16)
-        self.axes[11].set_xlim(left=0, right=1.1*self.max_a5)
-        #
-        self.axes[11].set_ylabel("Qber", fontsize=16)
-        self.axes[11].set_ylim(top=100, bottom=0)
-        #
-        self.axes[11].tick_params( axis = 'both', which ='major', labelsize = 14)
+        ### Simulation 5
+        self.axes[11].set_title("Qber Vs probabilidad "+r'$\alpha$'+" de despolarizacion para "+r'$\lambda$'+"="+str(self.lambdaa5), fontsize=16)
+        self.axes[11].set_xlabel(r'$\alpha$',fontsize=16)
+        self.axes[11].set_xlim(left=0,right=1.1*self.max_a5)
+        self.axes[11].set_ylabel("Qber",fontsize=16)
+        self.axes[11].set_ylim(top=100,bottom=0)
+        self.axes[11].tick_params(axis='both',which='major',labelsize=14)
         self.axes[11].set_facecolor('black')
         self.axes[11].grid(True, color='gray')
 
-
-        self.axes[12].set_xlabel(r'$\alpha$', fontsize=16)
-        self.axes[12].set_xlim(left=0, right=1.1*self.max_a5)
-        #
-        self.axes[12].set_ylabel("Ber", fontsize=16)
-        self.axes[12].set_ylim(top=100, bottom=0)
-        #
-        self.axes[12].tick_params(axis = 'both', which ='major', labelsize = 14)
+        self.axes[12].set_title("Ber Vs probabilidad "+r'$\alpha$'+" de despolarizacion para "+r'$\lambda$'+"="+str(self.lambdaa5), fontsize=16)
+        self.axes[12].set_xlabel(r'$\alpha$',fontsize=16)
+        self.axes[12].set_xlim(left=0,right=1.1*self.max_a5)
+        self.axes[12].set_ylabel("Ber",fontsize=16)
+        self.axes[12].set_ylim(top=100,bottom=0)
+        self.axes[12].tick_params(axis='both',which='major',labelsize=14)
         self.axes[12].set_facecolor('black')
         self.axes[12].grid(True, color='gray')
 
-
-        self.axes[13].set_xlabel(r'$\lambda$', fontsize=16)
-        self.axes[13].set_xlim(left=0, right=1.1*self.max_lambdaa6)
-        #
-        self.axes[13].set_ylabel("Qber", fontsize=16)
-        self.axes[13].set_ylim(top=100, bottom=0)
-        #
-        self.axes[13].tick_params( axis = 'both', which ='major', labelsize = 14)
-        self.axes[13].set_facecolor('black')
-        self.axes[13].grid(True, color='gray')
-
-
-        self.axes[14].set_xlabel(r'$\lambda$', fontsize=16)
-        self.axes[14].set_xlim(left=0, right=1.1*self.max_lambdaa6)
-        #
-        self.axes[14].set_ylabel("Ber", fontsize=16)
-        self.axes[14].set_ylim(top=100, bottom=0)
-        #
-        self.axes[14].tick_params(axis = 'both', which ='major', labelsize = 14)
-        self.axes[14].set_facecolor('black')
-        self.axes[14].grid(True, color='gray')
-
- 
-        self.axes[15].set_xlabel(r'$\alpha$', fontsize=16,labelpad=20)
-        self.axes[15].set_xlim(left=0, right=1.1*self.max_a7)
-        self.axes[15].tick_params(axis='x', which='major', pad=3)
-        #
-        self.axes[15].set_ylabel(r'$\lambda$', fontsize=16,labelpad=20)
-        self.axes[15].set_ylim(bottom=0, top=1.1*self.max_lambdaa7)
-        self.axes[15].tick_params(axis='y', which='major', pad=3)
-        #
-        self.axes[15].set_zlabel("Qber", fontsize=16,labelpad=15)
-        self.axes[15].set_zlim(bottom=0, top=100)
-        self.axes[15].tick_params(axis='z', which='major', pad=3)
-        #
-        self.axes[15].tick_params( axis = 'both', which ='major', labelsize = 14)
-        self.axes[15].grid(True, color='gray')
-
-
-        self.axes[16].set_xlabel(r'$\alpha$', fontsize=16,labelpad=20)
-        self.axes[16].set_xlim(left=0, right=1.1*self.max_a7)
-        self.axes[16].tick_params(axis='x', which='major', pad=3)
-        #
-        self.axes[16].set_ylabel(r'$\lambda$', fontsize=16,labelpad=20)
-        self.axes[16].set_ylim(bottom=0, top=1.1*self.max_lambdaa7)
-        self.axes[16].tick_params(axis='y', which='major', pad=3)
-        #
-        self.axes[16].set_zlabel("Ber", fontsize=16,labelpad=15)
-        self.axes[16].set_zlim(bottom=0, top=100)
-        self.axes[16].tick_params(axis='z', which='major', pad=3)
-        #
-        self.axes[16].tick_params(axis = 'both', which ='major', labelsize = 14)
-        self.axes[16].grid(True, color='gray')
-        
-        ## Legends ##
-        self.axes[0].legend(["Uno", "Cero","Teorico","Total"],loc= 'best', fontsize=13)
-        self.axes[1].legend(["Rectilinea", "Diagonal","Teorico","Total"],loc= 'best', fontsize=13)
-        self.axes[2].legend(["Agree", "Disagree", "Teorico","Total"],loc= 'best', fontsize=13)
-        self.axes[3].legend(["0","90","Teorico","0+45+90+135"],loc= 'best', fontsize=13)
-        self.axes[4].legend(["45","135","Teorico","0+45+90+135"],loc= 'best', fontsize=13)
-        self.axes[5].legend(["Simulacion", "Teorico"],loc= 'best', fontsize=13)
-        self.axes[6].legend(["Teorico", "Simulacion"],loc= 'best', fontsize=13)
-        self.axes[7].legend(["Simulacion", "Teorico"],loc= 'best', fontsize=13)
-        self.axes[8].legend(["Teorico", "Simulacion"],loc= 'best', fontsize=13)
-        #############
-        
-        ## Title ##
-        self.axes[0].set_title("Distribucion de unos y cero en la RawKey", fontsize=16)
-        self.axes[1].set_title("Distribucion de las Bases conjugadas", fontsize=16)
-        #
-        self.axes[2].set_title("Distribucion de las bases que concuerdan y no concuerdan en la Rawkey", fontsize=16)
-        #
-        self.axes[3].set_title("Distribucion de los estados 0 y 45 en la Rawkey", fontsize=16)
-        self.axes[4].set_title("Distribucion de los estados 90 y 135 en la Rawkey", fontsize=16)
-        #
-        self.axes[5].set_title("Dependencia del Qber con la longuitud de RawKey para "+r'$\alpha$'+"="+str(self.a4)+" y "+r'$\lambda$'+"="+str(self.lambdaa4), fontsize=16)
-        self.axes[6].set_title("Histograma del Qber para "+r'$\alpha$'+"="+str(self.a4)+" y "+r'$\lambda$'+"="+str(self.lambdaa4), fontsize=16)
-        self.axes[7].set_title("Desviacion estandar del Qber por grupo para "+r'$\alpha$'+"="+str(self.a4)+" y "+r'$\lambda$'+"="+str(self.lambdaa4), fontsize=16)
-        self.axes[8].set_title("Dependencia del Ber con la longuitud de RawKey para "+r'$\alpha$'+"="+str(self.a4)+" y "+r'$\lambda$'+"="+str(self.lambdaa4), fontsize=16)
-        self.axes[9].set_title("Histograma del Ber para "+r'$\alpha$'+"="+str(self.a4)+" y "+r'$\lambda$'+"="+str(self.lambdaa4), fontsize=16)
-        self.axes[10].set_title("Desviacion estandar del Ber por grupo para "+r'$\alpha$'+"="+str(self.a4)+" y "+r'$\lambda$'+"="+str(self.lambdaa4), fontsize=16)
-        #
-        self.axes[11].set_title("Qber Vs probabilidad "+r'$\alpha$'+" de despolarizacion para "+r'$\lambda$'+"="+str(self.lambdaa5), fontsize=16)
-        self.axes[12].set_title("Ber Vs probabilidad "+r'$\alpha$'+" de despolarizacion para "+r'$\lambda$'+"="+str(self.lambdaa5), fontsize=16)
-        #
+        ### Simulation 6
         self.axes[13].set_title("Qber Vs probabilidad "+r'$\lambda$'+" de aparicion de Eve para "+r'$\alpha$'+"="+str(self.a6), fontsize=16)
+        self.axes[13].set_xlabel(r'$\lambda$',fontsize=16)
+        self.axes[13].set_xlim(left=0,right=1.1*self.max_lambdaa6)
+        self.axes[13].set_ylabel("Qber",fontsize=16)
+        self.axes[13].set_ylim(top=100,bottom=0)
+        self.axes[13].tick_params(axis='both',which ='major',labelsize=14)
+        self.axes[13].set_facecolor('black')
+        self.axes[13].grid(True,color='gray')
+
         self.axes[14].set_title("Ber Vs probabilidad "+r'$\lambda$'+" de aparicion de Eve para "+r'$\alpha$'+"="+str(self.a6), fontsize=16)
-        #
+        self.axes[14].set_xlabel(r'$\lambda$',fontsize=16)
+        self.axes[14].set_xlim(left=0,right=1.1*self.max_lambdaa6)
+        self.axes[14].set_ylabel("Ber",fontsize=16)
+        self.axes[14].set_ylim(top=100,bottom=0)
+        self.axes[14].tick_params(axis='both',which='major',labelsize=14)
+        self.axes[14].set_facecolor('black')
+        self.axes[14].grid(True,color='gray')
+
+        ### Simulation 7
         self.axes[15].set_title("Qber como funcion de  "+r'$\lambda$'+" y "+r'$\alpha$', fontsize=16,pad=15)
+        self.axes[15].set_xlabel(r'$\alpha$',fontsize=16,labelpad=20)
+        self.axes[15].set_xlim(left=0,right=1.1*self.max_a7)
+        self.axes[15].tick_params(axis='x',which='major',pad=3)
+        self.axes[15].set_ylabel(r'$\lambda$',fontsize=16,labelpad=20)
+        self.axes[15].set_ylim(bottom=0,top=1.1*self.max_lambdaa7)
+        self.axes[15].tick_params(axis='y',which='major', pad=3)
+        self.axes[15].set_zlabel("Qber",fontsize=16,labelpad=15)
+        self.axes[15].set_zlim(bottom=0,top=100)
+        self.axes[15].tick_params(axis='z',which='major', pad=3)
+        self.axes[15].tick_params(axis='both',which='major',labelsize=14)
+        self.axes[15].grid(True,color='gray')
+
         self.axes[16].set_title("Ber como funcion de  "+r'$\lambda$'+" y "+r'$\alpha$', fontsize=16,pad=15)
+        self.axes[16].set_xlabel(r'$\alpha$',fontsize=16,labelpad=20)
+        self.axes[16].set_xlim(left=0,right=1.1*self.max_a7)
+        self.axes[16].tick_params(axis='x',which='major',pad=3)
+        self.axes[16].set_ylabel(r'$\lambda$',fontsize=16,labelpad=20)
+        self.axes[16].set_ylim(bottom=0,top=1.1*self.max_lambdaa7)
+        self.axes[16].tick_params(axis='y',which='major', pad=3)
+        self.axes[16].set_zlabel("Ber",fontsize=16,labelpad=15)
+        self.axes[16].set_zlim(bottom=0,top=100)
+        self.axes[16].tick_params(axis='z',which='major',pad=3)
+        self.axes[16].tick_params(axis='both',which='major',labelsize=14)
+        self.axes[16].grid(True,color='gray')    
+        
         ###########
         
         for i in range(17):
