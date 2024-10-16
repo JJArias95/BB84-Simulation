@@ -109,10 +109,8 @@ class grafica(wx.Frame):
         self.X2 = np.arange(0, 0.11, 0.01)
         self.Y2 = np.arange(0, 1.1, 0.1)
         self.X2, self.Y2 = np.meshgrid(self.X2, self.Y2)
-
         #################
 
-        
         self.dpi = 1000
         self.NamePlots=['Sim 1a','Sim 1b','Ejer 2','Ejer 3a','Ejer 3b',
                         'Ejer 4a','Ejer 4b','Ejer 4c','Ejer 4d','Ejer 4e',
@@ -123,74 +121,58 @@ class grafica(wx.Frame):
         self.create_menu()
         self.create_main_panel()
 
-    ## Simulation 1:Distribution of the bits and bases in the RawKey list 
-    ##              and the RanBases list, respectively.
-    ##              Distribution of the agree bases and the disagree bases 
-    ##              in the RanBases list bewteen Alice Bases and Bob bases.
-    ##              The theoretical value is 50%.
+    ## Simulation 1: Distribution of bits in the raw key list, bases 
+    ##               in the RanBases list, and matching and non-matching bases 
+    ##               between Alice's and Bob's bases in the RanBases list.
+    ##               The theoretical expectation is a 50% match rate.
 
     def simulation_1(self):
+
         RecIndexes=[]
         DiaIndexes=[]
         OnesIndexes=[]
         ZerosIndexes=[]
         AgreeBasesIndex=[]
         DisagreeBasesIndex=[]
+
         print("Simulation 1-start")
+
+        # Loop through simulations
         for i in range(self.NumSimSim1):
             RawKey=raw_key(self.NumBitsSim1) 
             AliceBases=random_bases(self.NumBitsSim1)
             BobBases=random_bases(self.NumBitsSim1)
             
             for j in range(self.NumBitsSim1):
-                (OnesIndexes if RawKey[j] == 1 
-                 else ZerosIndexes).append(j)
-                (RecIndexes if AliceBases[j] == "Rec" 
-                 else DiaIndexes).append(j)
+                (OnesIndexes if RawKey[j] == 1 else ZerosIndexes).append(j)
+                (RecIndexes if AliceBases[j]=="Rec" else DiaIndexes).append(j)
                 (AgreeBasesIndex if AliceBases[j]==BobBases[j] 
                  else DisagreeBasesIndex).append(j)
                 
-            
-        self.HistOnesSim1,Bin1 = np.histogram(OnesIndexes,
-                                              bins=range(self.NumBitsSim1+1))
-        self.HistZerosSim1,Bin2= np.histogram(ZerosIndexes,
-                                              bins=range(self.NumBitsSim1+1))
-        self.HistRecSim1,Bin3 = np.histogram(RecIndexes,
-                                             bins=range(self.NumBitsSim1+1))
-        self.HistDiaSim1,Bin4= np.histogram(DiaIndexes,
-                                            bins=range(self.NumBitsSim1+1))
-        self.HistAgreeBasesSim1, Bin5 = np.histogram(AgreeBasesIndex,
-                                         bins = range(self.NumBitsSim1+1))
-        self.HistDisagreeBasesSim1, Bin6 = np.histogram(DisagreeBasesIndex,
-                                         bins = range(self.NumBitsSim1+1))
+        # Define bin ranges once
+        bins = range(self.NumBitsSim1 + 1)
+
+        # Histogram calculations
+        self.HistOnesSim1,_= np.histogram(OnesIndexes,bins=bins)
+        self.HistZerosSim1,_=np.histogram(ZerosIndexes,bins=bins)
+        self.HistRecSim1,_=np.histogram(RecIndexes,bins=bins)
+        self.HistDiaSim1,_=np.histogram(DiaIndexes,bins=bins)
+        self.HistAgreeBasesSim1,_=np.histogram(AgreeBasesIndex,bins=bins)
+        self.HistDisagreeBasesSim1,_=np.histogram(DisagreeBasesIndex,bins=bins)
+
         print("Simulation 1-end\n")
 
     ## Observar que si se cumple que aproximadamente el 25% de los angulos estan compuesto por 0, otro 25% por 45, otro 25% por 90 y otro 25% por 135 
     def Ejercicio3(self):
         print("Ejercicio 3-start")
-        wf3=[]
+        HIndex=[]
+        Indexes45 = []
+        VIndexes = []
+        
         wf0=[]
         wf45=[]
         wf90=[]
         wf135=[]
-        # for i in range(0,self.lon33):
-        #     M3=RawKey(self.lon23)## Alice Bases
-        #     R3=RandomBase(self.lon23)## Bob Bases
-        #     N3=Encode(M3,R3)
-
-        #     for j in range(0,self.lon23):
-        #         wf3.append(N3[j])
-
-        # #this is for doing that wf falls down in the first block of length lon2#
-        # for O in range(0,self.lon23*self.lon33):
-        #     if wf3[O]==0:
-        #         wf0.append(O%self.lon23)#it's for selecting the indexs where there is a "0"
-        #     elif wf3[O]==45:
-        #         wf45.append(O%self.lon23)#it's for selecting the indexs where there is an "45"
-        #     elif wf3[O]==90:
-        #         wf90.append(O%self.lon23)#it's for selecting the indexs where there is an "90"
-        #     elif wf3[O]==135:
-        #         wf135.append(O%self.lon23)#it's for selecting the indexs where there is an "135"
 
         for i in range(0,self.lon33):
             M3=raw_key(self.lon23)## Alice Bases
@@ -229,7 +211,7 @@ class grafica(wx.Frame):
                 print("i: "+str(i))
             RR1=[]
             RR2=[]
-            for j in range(0,self.lon34):
+            for j in range(self.lon34):
                 ## Alice ##
                 L4=raw_key(int(i))
                 M4=random_bases(int(i))
@@ -641,12 +623,20 @@ class grafica(wx.Frame):
         for i in range(17):
             self.axes[i].cla()
 
+        #######################################################################
+        ####################### Running the simulations ########################
+        #######################################################################
+
         self.simulation_1()
         self.Ejercicio3()
         self.Ejercicio4()
         self.Ejercicio5()
         self.Ejercicio6()
         self.Ejercicio7()
+
+        #######################################################################
+        ################################# Plots ###############################
+        #######################################################################
 
         #Simulation 1
         self.axes[0].plot(
@@ -678,14 +668,12 @@ class grafica(wx.Frame):
             self.hisX0,((self.hist0+self.hist45+self.hist90+self.hist135)*100*((self.lon33)**(-1))),'y')
         
         #Simulation 4
-        self.axes[5].plot(
-            np.array(self.x4),self.ML4,'r',
+        self.axes[5].plot(np.array(self.x4),self.ML4,'r',
             self.x_values41,self.y_values41,'limegreen')
         self.axes[6].bar(self.hisX4,self.hist4,facecolor='#FF0000')
         self.axes[6].plot(self.x_values42,self.y_values42,'limegreen')
         self.axes[7].plot(self.XSTD4,self.STD4,'r')
-        self.axes[8].plot(
-            np.array(self.x4),self.ML42,'r',
+        self.axes[8].plot(np.array(self.x4),self.ML42,'r',
             self.x_values43,self.y_values43,'limegreen')
         self.axes[9].bar(self.hisX4,self.hist42,facecolor='#FF0000')
         self.axes[9].plot(self.x_values44,self.y_values44,'limegreen')
@@ -712,8 +700,13 @@ class grafica(wx.Frame):
             self.X2,self.Y2,self.Z72,  cmap='hot',antialiased=False, rstride=1, cstride=1, alpha=0.6)
         self.figs[16].colorbar(self.Dibujo13, shrink=0.5, aspect=5.5)
 
-        ### To customize the plots
-        ### Simulation 1
+        #######################################################################
+        ######################## To customize the plots #######################
+        #######################################################################
+
+        ####################
+        ### Simulation 1 ###
+        ####################
         self.axes[0].set_title("Distribution of ones and zeros in the raw" \
                                "key", fontsize=16)
         self.axes[0].set_xlabel("Posicion del bit",fontsize=16)
@@ -721,7 +714,7 @@ class grafica(wx.Frame):
         self.axes[0].set_ylabel("Probabilidad (%)",fontsize=16)
         self.axes[0].set_ylim(top=101,bottom=0)
         self.axes[0].tick_params(axis='both',which='major',labelsize=14)
-        self.axes[0].legend(["One","Zero","Theoretical","Total"],
+        self.axes[0].legend(["One","Zero","Theory","Total"],
                             loc='best',fontsize=13)
         self.axes[0].set_facecolor('black')
         self.axes[0].grid(True,color='gray')
@@ -733,7 +726,7 @@ class grafica(wx.Frame):
         self.axes[1].set_ylabel("Probabilidad (%)",fontsize=16)
         self.axes[1].set_ylim(top=101,bottom=0)
         self.axes[1].tick_params(axis='both',which='major',labelsize=14)
-        self.axes[1].legend(["Rectilinear", "Diagonal","Theoretical","Total"],
+        self.axes[1].legend(["Rectilinear", "Diagonal","Theory","Total"],
                             loc= 'best', fontsize=13)
         self.axes[1].set_facecolor('black')
         self.axes[1].grid(True, color='gray')
@@ -745,7 +738,7 @@ class grafica(wx.Frame):
         self.axes[2].set_ylabel("Probabilidad (%)",fontsize=16)
         self.axes[2].set_ylim(top=101,bottom=0)
         self.axes[2].tick_params(axis='both',which ='major',labelsize=14)
-        self.axes[2].legend(["Agree", "Disagree", "Theoretical","Total"],
+        self.axes[2].legend(["Agree", "Disagree", "Theory","Total"],
                             loc= 'best', fontsize=13)
         self.axes[2].set_facecolor('black')
         self.axes[2].grid(True, color='gray')
@@ -758,7 +751,7 @@ class grafica(wx.Frame):
         self.axes[3].set_ylabel("Probabilidad (%)",fontsize=16)
         self.axes[3].set_ylim(top=101,bottom=0)
         self.axes[3].tick_params(axis='both',which='major',labelsize=14)
-        self.axes[3].legend(["0","90","Theoretical","0+45+90+135"],
+        self.axes[3].legend(["0","90","Theory","0+45+90+135"],
                             loc= 'best', fontsize=13)
         self.axes[3].set_facecolor('black')
         self.axes[3].grid(True,color='gray')
@@ -771,7 +764,7 @@ class grafica(wx.Frame):
         self.axes[4].set_ylim(top=101,bottom=0)
         self.axes[4].set_facecolor('black')
         self.axes[4].tick_params(axis='both',which ='major',labelsize=14)
-        self.axes[4].legend(["45","135","Theoretical","0+45+90+135"],
+        self.axes[4].legend(["45","135","Theory","0+45+90+135"],
                             loc= 'best', fontsize=13)
         self.axes[4].grid(True,color='gray')
 
@@ -785,7 +778,7 @@ class grafica(wx.Frame):
         self.axes[5].set_ylabel("Qber",fontsize=16)
         self.axes[5].set_ylim(top=101,bottom=0)
         self.axes[5].tick_params(axis='both',which='major',labelsize=14)
-        self.axes[5].legend(["Simulation","Theoretical"],loc='best',fontsize=13)
+        self.axes[5].legend(["Simulation","Theory"],loc='best',fontsize=13)
         self.axes[5].set_facecolor('black')
         self.axes[5].grid(True,color='gray')
 
@@ -795,7 +788,7 @@ class grafica(wx.Frame):
         self.axes[6].set_ylabel("Numero de occurrencias",fontsize=16)
         self.axes[6].set_ylim(top=self.L,bottom=0)
         self.axes[6].tick_params(axis='both',which='major',labelsize=14)
-        self.axes[6].legend(["Theoretical","Simulation"],loc='best',fontsize=13)
+        self.axes[6].legend(["Theory","Simulation"],loc='best',fontsize=13)
         self.axes[6].set_facecolor('black')
         self.axes[6].grid(True, color='gray')
 
@@ -805,7 +798,7 @@ class grafica(wx.Frame):
         self.axes[7].set_ylabel('Desviacion Estandar',fontsize=16)
         self.axes[7].set_ylim(top=np.amax(self.STD4)+1,bottom=0)
         self.axes[7].tick_params( axis = 'both', which ='major',labelsize=14)
-        self.axes[7].legend(["Simulation","Theoretical"],loc='best',fontsize=13)
+        self.axes[7].legend(["Simulation","Theory"],loc='best',fontsize=13)
         self.axes[7].set_facecolor('black')
         self.axes[7].grid(True, color='gray')
 
@@ -815,7 +808,7 @@ class grafica(wx.Frame):
         self.axes[8].set_ylabel("Ber",fontsize=16)
         self.axes[8].set_ylim(top=101,bottom=0)
         self.axes[8].tick_params(axis='both',which ='major',labelsize=14)
-        self.axes[8].legend(["Theoretical","Simulation"],loc='best',fontsize=13)
+        self.axes[8].legend(["Theory","Simulation"],loc='best',fontsize=13)
         self.axes[8].set_facecolor('black')
         self.axes[8].grid(True,color='gray')
 
