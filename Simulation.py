@@ -358,7 +358,6 @@ class grafica(wx.Frame):
             self.XSim1,self.HistRec*100*((self.NumSimSim1)**(-1)),'r',
             self.XSim1,self.HistDia*100*((self.NumSimSim1)**(-1)),'b',
             [0, self.NumBitsSim1],[50,50],'limegreen')
-        
         self.axes[4].plot(
             self.XSim1,self.HistAgreeBases*100*((self.NumSimSim1)**(-1)),'r',
             self.XSim1,self.HistDisagreeBases*100*((self.NumSimSim1)**(-1)),'b',
