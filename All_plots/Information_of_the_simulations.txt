@@ -1,0 +1,21 @@
+=========================
+
+Simulation 1:Distribution of bits in the raw key list, bases 
+             in the RanBases list, matching and non-matching bases 
+             between Alice's and Bob's bases in the RanBases list,
+             and Qbits in the Qbits list.
+
+Length of the Rawkey: 600
+Number of simulations: 500
+
+=========================
+
+Ejercicio 2: Evolution of the complete Qber with respect to the length  
+             of the RawKey With a probability of Eve appearing on the communication.
+Maximum length of the Rawkey: 1000
+Number of simulations: 3
+Probability of Eve: 1
+Number of data per group for the standard deviation for the Qber: 50
+Number of data per group for the standard deviation for the Ber: 50
+
+=========================
