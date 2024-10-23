@@ -12,6 +12,7 @@ Number of simulations: 500
 
 Ejercicio 2: Evolution of the complete Qber with respect to the length  
              of the RawKey With a probability of Eve appearing on the communication.
+
 Maximum length of the Rawkey: 1000
 Number of simulations: 3
 Probability of Eve: 1

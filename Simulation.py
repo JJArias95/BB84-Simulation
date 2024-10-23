@@ -193,7 +193,7 @@ class grafica(wx.Frame):
             file.write("Number of simulations: "+str(self.NumSimSim1)+"\n")
             file.write("\n=========================\n\n")
             file.write("Ejercicio 2: Evolution of the complete Qber with respect to the length  \n")
-            file.write("             of the RawKey With a probability of Eve appearing on the communication.\n")
+            file.write("             of the RawKey With a probability of Eve appearing on the communication.\n\n")
             file.write("Maximum length of the Rawkey: "+str(self.NumBitsMax)+"\n")
             file.write("Number of simulations: "+str(self.NumSimSim2)+"\n")
             file.write("Probability of Eve: "+str(self.ProbEve)+"\n")
