@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import wx
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigCanvas
+import matplotlib.gridspec as gridspec
 import numpy as np
 import pylab
 import random
@@ -8,37 +9,9 @@ import os
 import shutil
 from bb84_protocol_module import *
 
-pylab.rcParams.update({
-        # 'axes.grid': False,
-        # 'grid.linestyle': '-',
-        # 'grid.alpha': 0.2,
-        # 'boxplot.notch':  False,
-        # 'boxplot.vertical': True,
-        # #
-        # 'lines.markersize': 4.0,
-        # 'xtick.minor.visible': True,
-        # 'xtick.direction': 'in',
-        # 'xtick.major.size': 5,
-        # 'xtick.minor.size': 2.5,
-        # 'xtick.top': False,
-        # 'xtick.major.pad': 10,
-        # #
-        # 'ytick.minor.visible': True,
-        # 'ytick.direction': 'in',
-        # 'ytick.major.size': 3.8,
-        # 'ytick.minor.size': 1.8,
-        # 'ytick.right': False,
-        # 'ytick.major.pad': 10,
-        # #
-        # 'axes.grid':True,
-        # 'axes.grid.which': 'major',
-        # "font.family":'sans',
-        # 'font.serif': 'Computer Modern Roman'
-        "text.usetex": True,
-        # "font.family": "sans-serif",
+pylab.rcParams.update({"text.usetex": True,
         "font.family": "serif",
-        "font.serif": ["Helvetica"]
-    })
+        "font.serif":["Computer Modern"]})
 
 class grafica(wx.Frame):
     title = 'Simulations of parameters into the QKD BB84 protocol'
@@ -58,10 +31,8 @@ class grafica(wx.Frame):
 
         self.dpi = 1000
         self.NamePlots=['Sim 1a','Sim 1b','Sim 1c','Sim 1d','Sim 1e',
-                        'Sim 2a','Sim 2b','Sim 2c','Sim 2d','Sim 2e',
-                        'Sim 2f',"Save all plots"]
+                        'Sim 2a','Sim 2b',"Save all plots"]
         
-
         self.create_menu()
         self.create_main_panel()
 
@@ -85,7 +56,6 @@ class grafica(wx.Frame):
 
         ## x-axis for the simulation 1 
         self.XSim1 = np.linspace(0,self.NumBitsSim1-1,num=self.NumBitsSim1)
-
         print("Simulation 1-start")
 
         # Loop through simulations
@@ -137,11 +107,6 @@ class grafica(wx.Frame):
         self.BinsBit = np.linspace(0,100-1,num=100)
         self.MeanQbers=[]
         self.MeanBers=[]
-        self.STDQber=[]
-        self.STDBer=[]
-        self.NumberGroupSTD=50
-        self.BinsSTD=np.round(np.linspace(1,int(self.NumBitsMax/self.NumberGroupSTD),
-                                          num=int(self.NumBitsMax/self.NumberGroupSTD))).astype(int)
         self.TheoBer=25+12.5*self.ProbEve
         self.TheoQber=25*self.ProbEve
         self.NumBitsList=np.linspace(90,self.NumBitsMax+90,
@@ -182,19 +147,6 @@ class grafica(wx.Frame):
             self.MeanQbers.append(np.mean(Qbers)*100)
             self.MeanBers.append(np.mean(Bers)*100)
 
-        Bins=range(100+1)
-        self.HistMeanQbers,_=np.histogram(self.MeanQbers,bins=Bins)
-        self.HistMeanBers,_=np.histogram(self.MeanBers,bins=Bins)
-
-        #### This is to observe the behavior of the Standard Deviation
-        #### each self.NumberGroupSTD of length ####
-        
-        for i in range(int(len(self.MeanQbers)/self.NumberGroupSTD)):
-            InitIndex=self.NumberGroupSTD*i
-            FinalIndex=self.NumberGroupSTD*(i+1)
-            self.STDQber.append(np.std(self.MeanQbers[InitIndex:FinalIndex]))
-            self.STDBer.append(np.std(self.MeanBers[InitIndex:FinalIndex]))
-
         print("Simulation 2")
         print("Mean value of Qber: "+str(np.mean(self.MeanQbers)))
         print("Mean value of Ber: "+str(np.mean(self.MeanBers)))
@@ -227,7 +179,6 @@ class grafica(wx.Frame):
             wildcard="TXT (*.txt)|*.txt",
             style=wx.FD_SAVE)
 
-        
         if dlg2.ShowModal() == wx.ID_OK:
             path = dlg2.GetPath()
             if os.path.exists(path):
@@ -246,8 +197,6 @@ class grafica(wx.Frame):
             file.write("Maximum length of the Rawkey: "+str(self.NumBitsMax)+"\n")
             file.write("Number of simulations: "+str(self.NumSimSim2)+"\n")
             file.write("Probability of Eve: "+str(self.ProbEve)+"\n")
-            file.write("Number of data per group for the standard deviation for the Qber: "+str(self.NumberGroupSTD)+"\n")
-            file.write("Number of data per group for the standard deviation for the Ber: "+str(self.NumberGroupSTD)+"\n")
             file.write("\n=========================")
 
             file.close()
@@ -279,14 +228,14 @@ class grafica(wx.Frame):
                     if os.path.exists(DirPath):
                         shutil.rmtree(DirPath)
                     os.mkdir(DirPath)
-                    for i in range(11):
+                    for i in range(7):
                         path = os.path.join(DirPath, self.NamePlots[i]+".pdf") 
                         self.canvas[i].print_figure(path, dpi=self.dpi)
 
         modal.Destroy()
 
     def on_exit(self, event):
-        for i in range(11):
+        for i in range(7):
             pylab.close(self.figs[i]) 
         self.Destroy()
 
@@ -297,23 +246,22 @@ class grafica(wx.Frame):
         ######
         self.figs=[]
         self.axes=[]
-        for i in range(11):
-            if i<6:
-                auxfigs,(auxaxes1,auxaxes2)=pylab.subplots(1,2)
-                self.axes.append(auxaxes1)
-                self.axes.append(auxaxes2)
-            else:
-                auxfigs,auxaxes=pylab.subplots(1)
-                self.axes.append(auxaxes)
+        for i in range(7):
+            auxfigs = pylab.figure(figsize=(10, 5))
             self.figs.append(auxfigs)
-
-
+            # Create subplots with specific positions
+            gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1])#Adjust width ratios
+            auxaxes1 = self.figs[i].add_subplot(gs[0])  # First plot gets more space
+            auxaxes2 = self.figs[i].add_subplot(gs[1])  # Second plot
+            self.axes.append(auxaxes1)
+            self.axes.append(auxaxes2)
+            
         ####
-        self.nb = wx.Notebook(self.panel,size=(2000,700),pos=(0,0)
-                              ,style=wx.NB_MULTILINE)
+        self.nb = wx.Notebook(self.panel,size=(2000,700),pos=(0,0),
+                              style=wx.NB_MULTILINE)
         ####
         self.canvas=[]
-        for i in range(11):
+        for i in range(7):
             self.canvas.append(FigCanvas(self.nb, -1, self.figs[i]))
             self.nb.AddPage(self.canvas[i], self.NamePlots[i])
 
@@ -326,10 +274,8 @@ class grafica(wx.Frame):
         self.init_plot()
         #######################
 
-
-
     def init_plot(self):
-        for i in range(11):
+        for i in range(7):
             self.axes[i].cla()
 
         self.simulation_1()
@@ -342,198 +288,362 @@ class grafica(wx.Frame):
         ####################
         ### Simulation 1 ###
         ####################
+
         self.axes[0].plot(
             self.XSim1,self.HistOnes*100*((self.NumSimSim1)**(-1)),'r',
             self.XSim1,self.HistZeros*100*((self.NumSimSim1)**(-1)),'b',
             [0, self.NumBitsSim1],[50,50],'limegreen')
-        self.axes[1].plot(
-            self.XSim1,self.HistOnes*100*((self.NumSimSim1)**(-1)),'r',
-            self.XSim1,self.HistZeros*100*((self.NumSimSim1)**(-1)),'b',
-            [0, self.NumBitsSim1],[50,50],'limegreen')
+        
+        self.axes[1].hist(self.HistOnes*100*((self.NumSimSim1)**(-1)),
+                          bins=20,color=(1,0,0,0.5),orientation="horizontal",
+                          edgecolor="black",linewidth=1.5 )
+        self.axes[1].hist(self.HistZeros*100*((self.NumSimSim1)**(-1)),
+                          bins=20,color=(0,0,1,0.5),orientation="horizontal",
+                          edgecolor="black",linewidth=1.5)
+        self.axes[1].plot([0, 200],[50,50],'limegreen')
+        
         self.axes[2].plot(
             self.XSim1,self.HistRec*100*((self.NumSimSim1)**(-1)),'r',
             self.XSim1,self.HistDia*100*((self.NumSimSim1)**(-1)),'b',
             [0, self.NumBitsSim1],[50,50],'limegreen')
-        self.axes[3].plot(
-            self.XSim1,self.HistRec*100*((self.NumSimSim1)**(-1)),'r',
-            self.XSim1,self.HistDia*100*((self.NumSimSim1)**(-1)),'b',
-            [0, self.NumBitsSim1],[50,50],'limegreen')
         
+        self.axes[3].hist(self.HistRec*100*((self.NumSimSim1)**(-1)),
+                          bins=20,color=(1,0,0,0.5),orientation="horizontal",
+                          edgecolor="black",linewidth=1.5 )
+        self.axes[3].hist(self.HistDia*100*((self.NumSimSim1)**(-1)),
+                          bins=20,color=(0,0,1,0.5),orientation="horizontal",
+                          edgecolor="black",linewidth=1.5)
+        self.axes[3].plot([0,self.NumBitsSim1],[50,50],'limegreen')
+
         self.axes[4].plot(
             self.XSim1,self.HistAgreeBases*100*((self.NumSimSim1)**(-1)),'r',
             self.XSim1,self.HistDisagreeBases*100*((self.NumSimSim1)**(-1)),'b',
             [0, self.NumBitsSim1],[50,50],'limegreen')
-        self.axes[5].plot(
-            self.XSim1,self.HistAgreeBases*100*((self.NumSimSim1)**(-1)),'r',
-            self.XSim1,self.HistDisagreeBases*100*((self.NumSimSim1)**(-1)),'b',
-            [0, self.NumBitsSim1],[50,50],'limegreen')
+        self.axes[5].hist(self.HistAgreeBases*100*((self.NumSimSim1)**(-1)),
+                          bins=20,color=(1,0,0,0.5),orientation="horizontal",
+                          edgecolor="black",linewidth=1.5 )
+        self.axes[5].hist(self.HistDisagreeBases*100*((self.NumSimSim1)**(-1)),
+                          bins=20,color=(0,0,1,0.5),orientation="horizontal",
+                          edgecolor="black",linewidth=1.5)
+        self.axes[5].plot([0,self.NumBitsSim1],[50,50],'limegreen')
         
         self.axes[6].plot(
             self.XSim1,self.HistH*100*((self.NumSimSim1)**(-1)),'r',
             self.XSim1,self.HistV*100*((self.NumSimSim1)**(-1)),'b',
             [0, self.NumBitsSim1],[25,25],'limegreen')
-        self.axes[7].plot(
-            self.XSim1,self.HistH*100*((self.NumSimSim1)**(-1)),'r',
-            self.XSim1,self.HistV*100*((self.NumSimSim1)**(-1)),'b',
-            [0, self.NumBitsSim1],[25,25],'limegreen')
+        self.axes[7].hist(self.HistH*100*((self.NumSimSim1)**(-1)),
+                          bins=20,color=(1,0,0,0.5),orientation="horizontal",
+                          edgecolor="black",linewidth=1.5 )
+        self.axes[7].hist(self.HistV*100*((self.NumSimSim1)**(-1)),
+                          bins=20,color=(0,0,1,0.5),orientation="horizontal",
+                          edgecolor="black",linewidth=1.5)
+        self.axes[7].plot([0,self.NumBitsSim1],[25,25],'limegreen')
+
         self.axes[8].plot(
             self.XSim1,self.Hist45*100*((self.NumSimSim1)**(-1)),'r',
             self.XSim1,self.Hist135*100*((self.NumSimSim1)**(-1)),'b',
             [0, self.NumBitsSim1],[25,25],'limegreen')
-        self.axes[9].plot(
-            self.XSim1,self.Hist45*100*((self.NumSimSim1)**(-1)),'r',
-            self.XSim1,self.Hist135*100*((self.NumSimSim1)**(-1)),'b',
-            [0, self.NumBitsSim1],[25,25],'limegreen')
+        self.axes[9].hist(self.Hist45*100*((self.NumSimSim1)**(-1)),
+                          bins=20,color=(1,0,0,0.5),orientation="horizontal",
+                          edgecolor="black",linewidth=1.5 )
+        self.axes[9].hist(self.Hist135*100*((self.NumSimSim1)**(-1)),
+                          bins=20,color=(0,0,1,0.5),orientation="horizontal",
+                          edgecolor="black",linewidth=1.5)
+        self.axes[9].plot([0,self.NumBitsSim1],[25,25],'limegreen')
 
         ####################
         ### Simulation 2 ###
         ####################
+
         self.axes[10].plot(np.array(self.NumBitsList),self.MeanQbers,'r',
             [0, self.NumBitsMax],[self.TheoQber, self.TheoQber],'limegreen')
-        self.axes[11].plot(np.array(self.NumBitsList),self.MeanQbers,'r',
-            [0, self.NumBitsMax],[self.TheoQber, self.TheoQber],'limegreen')
-        self.axes[12].bar(self.BinsBit,self.HistMeanQbers,facecolor='#FF0000')
-        self.axes[12].plot([self.TheoQber,self.TheoQber],
-                          [0, np.amax(self.HistMeanQbers)+500],'limegreen')
-        self.axes[13].plot(self.BinsSTD,self.STDQber,'r')
-        self.axes[14].plot(np.array(self.NumBitsList),self.MeanBers,'r',
+        self.axes[11].hist(self.MeanQbers,bins=20,color=(1,0,0,0.5),
+                           orientation="horizontal",edgecolor="black",
+                           linewidth=1.5 )
+        self.axes[11].plot([0, self.NumBitsMax],[self.TheoQber,self.TheoQber],
+                           'limegreen')
+
+        self.axes[12].plot(np.array(self.NumBitsList),self.MeanBers,'r',
             [0, self.NumBitsMax],[self.TheoBer, self.TheoBer],'limegreen')
-        self.axes[15].bar(self.BinsBit,self.HistMeanBers,facecolor='#FF0000')
-        self.axes[15].plot([self.TheoBer, self.TheoBer],
-                          [0, np.amax(self.HistMeanBers)+500],'limegreen')
-        self.axes[16].plot(self.BinsSTD,self.STDBer,'r')
+        self.axes[13].hist(self.MeanBers,bins=20,color=(1,0,0,0.5),
+                           orientation="horizontal",edgecolor="black",
+                           linewidth=1.5 )
+        self.axes[13].plot([0, self.NumBitsMax],[self.TheoBer,self.TheoBer],
+                           'limegreen')
 
         #######################################################################
         ######################## To customize the plots #######################
         #######################################################################
-
+        
+        [self.figs[j].subplots_adjust(wspace=0.06, hspace=0.1) for j in range(7)]
+        
         ####################
         ### Simulation 1 ###
         ####################
-        # self.axes[0].set_title("Distribution of ones and zeros in the raw " \
-        #                        "key", fontsize=16)
-        # self.axes[0].set_xlabel("Bit position",fontsize=16)
-        # self.axes[0].set_xlim(left=0,right=self.NumBitsSim1)
-        # self.axes[0].set_ylabel("Probability [\%]",fontsize=16)
-        # self.axes[0].set_ylim(top=100,bottom=0)
-        # self.axes[0].tick_params(axis='both',which='major',labelsize=14)
-        # self.axes[0].legend(["One","Zero","Theory"],
-        #                     loc='best',fontsize=13)
-        # self.axes[0].grid(True,color='gray')
 
-        # self.axes[1].set_title("Distribution of conjugate bases in the bases "\
-        #                        "list", fontsize=16)
-        # self.axes[1].set_xlabel("Basis position",fontsize=16)
-        # self.axes[1].set_xlim(left=0,right=self.NumBitsSim1)
-        # self.axes[1].set_ylabel("Probability [\%]",fontsize=16)
-        # self.axes[1].set_ylim(top=100,bottom=0)
-        # self.axes[1].tick_params(axis='both',which='major',labelsize=14)
-        # self.axes[1].legend(["Rectilinear", "Diagonal","Theory"],
-        #                     loc= 'best', fontsize=13)
-        # self.axes[1].grid(True, color='gray')
+        self.axes[0].set_title("Distribution of ones and zeros in the raw " \
+                               "key", fontsize=16)
+        self.axes[0].set_xlabel("Bit position",fontsize=16)
+        self.axes[0].set_xlim(left=0,right=self.NumBitsSim1)
+        self.axes[0].set_xticks(range(0,self.NumBitsSim1+1,100))
+        self.axes[0].set_xticks([j for j in range(0,self.NumBitsSim1+1,25)],minor=True)
+        self.axes[0].set_ylabel("Probability [\%]",fontsize=16)
+        self.axes[0].set_ylim(bottom=40,top=60)
+        self.axes[0].set_yticks([j/10 for j in range(400,601,25)])
+        self.axes[0].set_yticks([j/1000 for j in range(40000,60001,625)],
+                                minor=True)
+        self.axes[0].tick_params(bottom=True,top=True,left=True,right=True,
+                                direction='in',which="major", 
+                                length=9,width=1,labelsize=14)
+        self.axes[0].tick_params(bottom=True,top=True,left=True,right=True,
+                                direction='in',which="minor", 
+                                length=3,width=1)
+        self.axes[0].legend(["One","Zero","Theory"],loc='upper right',fontsize=13)
 
-        # self.axes[2].set_title("Distribution of the agree bases and the" \
-        #                        "disagree bases in the bases list",fontsize=16)
-        # self.axes[2].set_xlabel("Basis position",fontsize=16)
-        # self.axes[2].set_xlim(left=0,right=self.NumBitsSim1)
-        # self.axes[2].set_ylabel("Probability [\%]",fontsize=16)
-        # self.axes[2].set_ylim(top=100,bottom=0)
-        # self.axes[2].tick_params(axis='both',which ='major',labelsize=14)
-        # self.axes[2].legend(["Agree", "Disagree", "Theory"],
-        #                     loc= 'best', fontsize=13)
-        # self.axes[2].grid(True, color='gray')
+        self.axes[1].set_xlabel("Counts",fontsize=16)
+        self.axes[1].minorticks_on()
+        self.axes[1].set_xlim(left=0,right=100)
+        self.axes[1].set_xticks([j for j in range(0,101,25)])
+        self.axes[1].set_xticks([j/100 for j in range(0,10001,625)],minor=True)
+        self.axes[1].set_ylim(bottom=40,top=60)
+        self.axes[1].set_yticklabels([])
+        self.axes[1].set_yticks([j/1000 for j in range(40000,60001,625)],minor=True)
+        self.axes[1].tick_params(bottom=True,top=True,left=True,right=True, 
+                                direction='in',which="major", 
+                                length=9,width=1,labelsize=14)
+        self.axes[1].tick_params(bottom=True,top=True,left=True,right=True,
+                                direction='in',which="minor", 
+                                length=3,width=1)
+        self.axes[1].legend(["Theory","One","Zero"],loc='best',fontsize=13)
+        
+        self.axes[2].set_title("Distribution of conjugate bases in the bases "\
+                                "list", fontsize=16)
+        self.axes[2].set_xlabel("Basis position",fontsize=16)
+        self.axes[2].set_xlim(left=0,right=self.NumBitsSim1)
+        self.axes[2].set_xticks(range(0,self.NumBitsSim1+1,100))
+        self.axes[2].set_xticks([j for j in range(0,self.NumBitsSim1+1,25)],minor=True)
+        self.axes[2].set_ylabel("Probability [\%]",fontsize=16)
+        self.axes[2].set_ylim(bottom=40,top=60)
+        self.axes[2].set_yticks([j/10 for j in range(400,601,25)])
+        self.axes[2].set_yticks([j/1000 for j in range(40000,60001,625)],
+                                minor=True)
+        self.axes[2].tick_params(bottom=True,top=True,left=True,right=True,
+                                direction='in',which="major", 
+                                length=9,width=1,labelsize=14)
+        self.axes[2].tick_params(bottom=True,top=True,left=True,right=True,
+                                direction='in',which="minor", 
+                                length=3,width=1)
+        self.axes[2].legend(["Rectilinear", "Diagonal","Theory"],loc='upper right',fontsize=13)
 
-        # self.axes[3].set_title("Distribution of states |H⟩ and |V⟩ in the"\
-        #                        "raw key",fontsize=16)
-        # self.axes[3].set_xlabel("Qbit position",fontsize=16)
-        # self.axes[3].set_xlim(left=0, right=self.NumBitsSim1)
-        # self.axes[3].set_ylabel("Probability [\%]",fontsize=16)
-        # self.axes[3].set_ylim(top=100,bottom=0)
-        # self.axes[3].tick_params(axis='both',which='major',labelsize=14)
-        # self.axes[3].legend(["|H⟩","|V⟩","Theory"],
-        #                     loc= 'best', fontsize=13)
-        # self.axes[3].grid(True,color='gray')
+        self.axes[3].set_xlabel("Counts",fontsize=16)
+        self.axes[3].minorticks_on()
+        self.axes[3].set_xlim(left=0,right=100)
+        self.axes[3].set_xticks([j for j in range(0,101,25)])
+        self.axes[3].set_xticks([j/100 for j in range(0,10001,625)],minor=True)
+        self.axes[3].set_ylim(bottom=40,top=60)
+        self.axes[3].set_yticklabels([])
+        self.axes[3].set_yticks([j/1000 for j in range(40000,60001,625)],minor=True)
+        self.axes[3].tick_params(bottom=True,top=True,left=True,right=True, 
+                                direction='in',which="major", 
+                                length=9,width=1,labelsize=14)
+        self.axes[3].tick_params(bottom=True,top=True,left=True,right=True,
+                                direction='in',which="minor", 
+                                length=3,width=1)
+        self.axes[3].legend(["Theory","Rectilinear","Diagonal"],loc='best',fontsize=13)
 
-        # self.axes[4].set_title("Distribution of states |45⟩ and |135⟩ in the"\
-        #                        "raw key", fontsize=16)
-        # self.axes[4].set_xlabel("Qbit position",fontsize=16)
-        # self.axes[4].set_xlim(left=0,right=self.NumBitsSim1)
-        # self.axes[4].set_ylabel("Probability [\%]",fontsize=16)
-        # self.axes[4].set_ylim(top=100,bottom=0)
-        # self.axes[4].tick_params(axis='both',which ='major',labelsize=14)
-        # self.axes[4].legend(["|45⟩","|135⟩","Theory"],
-        #                     loc= 'best', fontsize=13)
-        # self.axes[4].grid(True,color='gray')
+        self.axes[4].set_title("Distribution of the agree bases and the" \
+                               "disagree bases in the bases list",fontsize=16)
+        self.axes[4].set_xlabel("Basis position",fontsize=16)
+        self.axes[4].set_xlim(left=0,right=self.NumBitsSim1)
+        self.axes[4].set_xticks(range(0,self.NumBitsSim1+1,100))
+        self.axes[4].set_xticks([j for j in range(0,self.NumBitsSim1+1,25)],minor=True)
+        self.axes[4].set_ylabel("Probability [\%]",fontsize=16)
+        self.axes[4].set_ylim(bottom=40,top=60)
+        self.axes[4].set_yticks([j/10 for j in range(400,601,25)])
+        self.axes[4].set_yticks([j/1000 for j in range(40000,60001,625)],
+                                minor=True)
+        self.axes[4].tick_params(bottom=True,top=True,left=True,right=True,
+                                direction='in',which="major", 
+                                length=9,width=1,labelsize=14)
+        self.axes[4].tick_params(bottom=True,top=True,left=True,right=True,
+                                direction='in',which="minor", 
+                                length=3,width=1)
+        self.axes[4].legend(["Agree", "Disagree", "Theory"],loc='upper right',fontsize=13)
+
+        self.axes[5].set_xlabel("Counts",fontsize=16)
+        self.axes[5].minorticks_on()
+        self.axes[5].set_xlim(left=0,right=100)
+        self.axes[5].set_xticks([j for j in range(0,101,25)])
+        self.axes[5].set_xticks([j/100 for j in range(0,10001,625)],minor=True)
+        self.axes[5].set_ylim(bottom=40,top=60)
+        self.axes[5].set_yticklabels([])
+        self.axes[5].set_yticks([j/1000 for j in range(40000,60001,625)],minor=True)
+        self.axes[5].tick_params(bottom=True,top=True,left=True,right=True, 
+                                direction='in',which="major", 
+                                length=9,width=1,labelsize=14)
+        self.axes[5].tick_params(bottom=True,top=True,left=True,right=True,
+                                direction='in',which="minor", 
+                                length=3,width=1)
+        self.axes[5].legend(["Theory","Agree","Disagree"],loc='best',fontsize=13)
+
+        self.axes[6].set_title("Distribution of states $|\\rm{H}\\rangle$ "\
+                               "and $|\\rm{V}\\rangle$ in the raw key",
+                               fontsize=16)
+        self.axes[6].set_xlabel("Qbit position",fontsize=16)
+        self.axes[6].set_xlim(left=0,right=self.NumBitsSim1)
+        self.axes[6].set_xticks(range(0,self.NumBitsSim1+1,100))
+        self.axes[6].set_xticks([j for j in range(0,self.NumBitsSim1+1,25)],minor=True)
+        self.axes[6].set_ylabel("Probability [\%]",fontsize=16)
+        self.axes[6].set_ylim(bottom=15,top=35)
+        self.axes[6].set_yticks([j/10 for j in range(150,351,25)])
+        self.axes[6].set_yticks([j/1000 for j in range(15000,35001,625)],
+                                minor=True)
+        self.axes[6].tick_params(bottom=True,top=True,left=True,right=True,
+                                direction='in',which="major", 
+                                length=9,width=1,labelsize=14)
+        self.axes[6].tick_params(bottom=True,top=True,left=True,right=True,
+                                direction='in',which="minor", 
+                                length=3,width=1)
+        self.axes[6].legend(["$|\\rm{H}\\rangle$ ","$|\\rm{V}\\rangle$ ",
+                             "Theory"],loc='upper right',fontsize=13)
+
+        self.axes[7].set_xlabel("Counts",fontsize=16)
+        self.axes[7].minorticks_on()
+        self.axes[7].set_xlim(left=0,right=100)
+        self.axes[7].set_xticks([j for j in range(0,101,25)])
+        self.axes[7].set_xticks([j/100 for j in range(0,10001,625)],minor=True)
+        self.axes[7].set_ylim(bottom=15,top=35)
+        self.axes[7].set_yticklabels([])
+        self.axes[7].set_yticks([j/1000 for j in range(15000,35001,625)],minor=True)
+        self.axes[7].tick_params(bottom=True,top=True,left=True,right=True, 
+                                direction='in',which="major", 
+                                length=9,width=1,labelsize=14)
+        self.axes[7].tick_params(bottom=True,top=True,left=True,right=True,
+                                direction='in',which="minor", 
+                                length=3,width=1)
+        self.axes[7].legend(["Theory","$|\\rm{H}\\rangle$ ","$|\\rm{V}\\rangle$ "],
+                             loc='best',fontsize=13)
+
+        self.axes[8].set_title("Distribution of states $|45\\rangle$ and "\
+                               "$|135\\rangle$ in the raw key", fontsize=16)
+        self.axes[8].set_xlabel("Qbit position",fontsize=16)
+        self.axes[8].set_xlim(left=0,right=self.NumBitsSim1)
+        self.axes[8].set_xticks(range(0,self.NumBitsSim1+1,100))
+        self.axes[8].set_xticks([j for j in range(0,self.NumBitsSim1+1,25)],minor=True)
+        self.axes[8].set_ylabel("Probability [\%]",fontsize=16)
+        self.axes[8].set_ylim(bottom=15,top=35)
+        self.axes[8].set_yticks([j/10 for j in range(150,351,25)])
+        self.axes[8].set_yticks([j/1000 for j in range(15000,35001,625)],
+                                minor=True)
+        self.axes[8].tick_params(bottom=True,top=True,left=True,right=True,
+                                direction='in',which="major", 
+                                length=9,width=1,labelsize=14)
+        self.axes[8].tick_params(bottom=True,top=True,left=True,right=True,
+                                direction='in',which="minor", 
+                                length=3,width=1)
+        self.axes[8].legend(["$|45\\rangle$","$|135\\rangle$","Theory"],
+                            loc='upper right',fontsize=13)
+
+        self.axes[9].set_xlabel("Counts",fontsize=16)
+        self.axes[9].minorticks_on()
+        self.axes[9].set_xlim(left=0,right=100)
+        self.axes[9].set_xticks([j for j in range(0,101,25)])
+        self.axes[9].set_xticks([j/100 for j in range(0,10001,625)],minor=True)
+        self.axes[9].set_ylim(bottom=15,top=35)
+        self.axes[9].set_yticklabels([])
+        self.axes[9].set_yticks([j/1000 for j in range(15000,35001,625)],minor=True)
+        self.axes[9].tick_params(bottom=True,top=True,left=True,right=True, 
+                                direction='in',which="major", 
+                                length=9,width=1,labelsize=14)
+        self.axes[9].tick_params(bottom=True,top=True,left=True,right=True,
+                                direction='in',which="minor", 
+                                length=3,width=1)
+        self.axes[9].legend(["Theory","$|45\\rangle$","$|135\\rangle$"],
+                             loc='best',fontsize=13)
 
         # ####################
         # ### Simulation 2 ###
         # ####################
-        # self.axes[5].set_title("Dependence of Qber on the length of raw key "
-        #                         "for "+r'$\lambda$'+"="+str(self.ProbEve), 
-        #                         fontsize=16)
-        # self.axes[5].set_xlabel("Raw key length", fontsize=16)
-        # self.axes[5].set_xlim(left=0, right=self.NumBitsMax)
-        # self.axes[5].set_ylabel("Qber [\%]",fontsize=16)
-        # self.axes[5].set_ylim(top=100,bottom=0)
-        # self.axes[5].tick_params(axis='both',which='major',labelsize=14)
-        # self.axes[5].legend(["Simulation","Theory"],loc='best',fontsize=13)
-        # self.axes[5].grid(True,color='gray')
 
-        # self.axes[6].set_title("Qber histogram for "+r'$\lambda$'+\
-        #                        "="+str(self.ProbEve), fontsize=16)
-        # self.axes[6].set_xlabel("Qber [\%]",fontsize=16)
-        # self.axes[6].set_xlim(left=10,right=40)
-        # self.axes[6].set_ylabel("Counts",fontsize=16)
-        # self.axes[6].set_ylim(bottom=0,top=np.amax(self.HistMeanQbers)+500)
-        # self.axes[6].tick_params(axis='both',which='major',labelsize=14)
-        # self.axes[6].legend(["Theory","Simulation"],loc='best',fontsize=13)
-        # self.axes[6].grid(True, color='gray')
+        self.axes[10].set_title("Dependence of Qber on the length of raw key "
+                                "for "+r'$\lambda$'+"="+str(self.ProbEve), 
+                                fontsize=16)
+        self.axes[10].set_xlabel("Raw key length",fontsize=16)
+        self.axes[10].set_xlim(left=0,right=self.NumBitsMax)
+        self.axes[10].set_xticks(range(0,self.NumBitsMax+1,100))
+        self.axes[10].set_xticks([j for j in range(0,self.NumBitsMax+1,25)],minor=True)
+        self.axes[10].set_ylabel("Qber [\%]",fontsize=16)
+        self.axes[10].set_ylim(bottom=15,top=35)
+        self.axes[10].set_yticks([j/10 for j in range(150,351,25)])
+        self.axes[10].set_yticks([j/1000 for j in range(15000,35001,625)],
+                                minor=True)
+        self.axes[10].tick_params(bottom=True,top=True,left=True,right=True,
+                                direction='in',which="major", 
+                                length=9,width=1,labelsize=14)
+        self.axes[10].tick_params(bottom=True,top=True,left=True,right=True,
+                                direction='in',which="minor", 
+                                length=3,width=1)
+        self.axes[10].legend(["Theory","Simulation"],
+                            loc='upper right',fontsize=13)
 
-        # self.axes[7].set_title("Qber standard deviation by group for "+
-        #                        r'$\lambda$'+"="+str(self.ProbEve), 
-        #                        fontsize=16)
-        # self.axes[7].set_xlabel('Group number',fontsize=16)
-        # self.axes[7].set_xlim(left=0,
-        #                       right=(self.NumBitsMax/self.NumberGroupSTD)+10)
-        # self.axes[7].set_ylabel('Standard deviation',fontsize=16)
-        # self.axes[7].set_ylim(top=np.amax(self.STDQber)+1,bottom=0)
-        # self.axes[7].tick_params( axis = 'both', which ='major',labelsize=14)
-        # self.axes[7].legend(["Simulation","Theory"],loc='best',fontsize=13)
-        # self.axes[7].grid(True, color='gray')
+        self.axes[11].set_xlabel("Counts",fontsize=16)
+        self.axes[11].minorticks_on()
+        self.axes[11].set_xlim(left=0,right=100)
+        self.axes[11].set_xticks([j for j in range(0,201,50)])
+        self.axes[11].set_xticks([j/10 for j in range(0,2001,125)],minor=True)
+        self.axes[11].set_ylim(bottom=15,top=35)
+        self.axes[11].set_yticklabels([])
+        self.axes[11].set_yticks([j/1000 for j in range(15000,35001,625)],minor=True)
+        self.axes[11].tick_params(bottom=True,top=True,left=True,right=True, 
+                                direction='in',which="major", 
+                                length=9,width=1,labelsize=14)
+        self.axes[11].tick_params(bottom=True,top=True,left=True,right=True,
+                                direction='in',which="minor", 
+                                length=3,width=1)
+        self.axes[11].legend(["Theory","Simulation"],
+                             loc='best',fontsize=13)
 
-        # self.axes[8].set_title("Dependence of Ber on the length of raw key "\
-        #                         "for "+r'$\lambda$'+"="+str(self.ProbEve), 
-        #                         fontsize=16)
-        # self.axes[8].set_xlabel("Raw key length",fontsize=16)
-        # self.axes[8].set_xlim(left=0,right=self.NumBitsMax)
-        # self.axes[8].set_ylabel("Ber",fontsize=16)
-        # self.axes[8].set_ylim(top=100,bottom=0)
-        # self.axes[8].tick_params(axis='both',which ='major',labelsize=14)
-        # self.axes[8].legend(["Theory","Simulation"],loc='best',fontsize=13)
-        # self.axes[8].grid(True,color='gray')
+        self.axes[12].set_title("Dependence of Ber on the length of raw key "\
+                                "for "+r'$\lambda$'+"="+str(self.ProbEve), 
+                                fontsize=16)
+        self.axes[12].set_xlabel("Raw key length",fontsize=16)
+        self.axes[12].set_xlim(left=0,right=self.NumBitsMax)
+        self.axes[12].set_xticks(range(0,self.NumBitsMax+1,100))
+        self.axes[12].set_xticks([j for j in range(0,self.NumBitsMax+1,25)],minor=True)
+        self.axes[12].set_ylabel("Ber [\%]",fontsize=16)
+        self.axes[12].set_ylim(bottom=25,top=45)
+        self.axes[12].set_yticks([j/10 for j in range(250,451,25)])
+        self.axes[12].set_yticks([j/1000 for j in range(25000,45001,625)],
+                                minor=True)
+        self.axes[12].tick_params(bottom=True,top=True,left=True,right=True,
+                                direction='in',which="major", 
+                                length=9,width=1,labelsize=14)
+        self.axes[12].tick_params(bottom=True,top=True,left=True,right=True,
+                                direction='in',which="minor", 
+                                length=3,width=1)
+        self.axes[12].legend(["Theory","Simulation"],
+                            loc='upper right',fontsize=13)
 
-        # self.axes[9].set_title("Ber histogram for "+r'$\lambda$'+"="+
-        #                        str(self.ProbEve), fontsize=16)
-        # self.axes[9].set_xlabel("Ber",fontsize=16)
-        # self.axes[9].set_xlim(left=20,right=50)
-        # self.axes[9].set_ylabel("Counts",fontsize=16)
-        # self.axes[9].set_ylim(bottom=0,top=np.amax(self.HistMeanBers)+500)
-        # self.axes[9].tick_params(axis='both',which='major',labelsize=14)
-        # self.axes[9].grid(True,color='gray')
+        self.axes[13].set_xlabel("Counts",fontsize=16)
+        self.axes[13].minorticks_on()
+        self.axes[13].set_xlim(left=0,right=100)
+        self.axes[13].set_xticks([j for j in range(0,201,50)])
+        self.axes[13].set_xticks([j/10 for j in range(0,2001,125)],minor=True)
+        self.axes[13].set_ylim(bottom=25,top=45)
+        self.axes[13].set_yticklabels([])
+        self.axes[13].set_yticks([j/1000 for j in range(25000,45001,625)],minor=True)
+        self.axes[13].tick_params(bottom=True,top=True,left=True,right=True, 
+                                direction='in',which="major", 
+                                length=9,width=1,labelsize=14)
+        self.axes[13].tick_params(bottom=True,top=True,left=True,right=True,
+                                direction='in',which="minor", 
+                                length=3,width=1)
+        self.axes[13].legend(["Theory","Simulation"],
+                             loc='best',fontsize=13)
 
-        # self.axes[10].set_title("Ber standard deviation by group for "+
-        #                         r'$\lambda$'+"="+str(self.ProbEve),fontsize=16)
-        # self.axes[10].set_xlabel('Group number',fontsize=16)
-        # self.axes[10].set_xlim(left=0, 
-        #                        right=(self.NumBitsMax/self.NumberGroupSTD)+10)
-        # self.axes[10].set_ylabel('Standard deviation',fontsize=16)
-        # self.axes[10].set_ylim(top=np.amax(self.STDBer)+1,bottom=0)
-        # self.axes[10].tick_params(axis='both',which ='major',labelsize=14)
-        # self.axes[10].grid(True,color='gray')
-        
         ###########
-        
-        for i in range(11):
+    
+        for i in range(7):
             self.axes[i].relim()
             self.axes[i].autoscale_view()
             self.canvas[i].draw()
