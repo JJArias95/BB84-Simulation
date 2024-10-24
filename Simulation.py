@@ -36,9 +36,10 @@ class grafica(wx.Frame):
         self.create_menu()
         self.create_main_panel()
 
-    ## Simulation 1: Distribution of bits in the raw key list, bases 
-    ##               in the RanBases list, matching and non-matching bases 
-    ##               between Alice's and Bob's bases in the RanBases list,
+    
+    ## Simulation 1: Distribution of bits in the raw key list, bases in 
+    ##               the random bases list, matching and non-matching bases
+    ##               between Alice's and Bob's bases in the RanBases list, 
     ##               and Qbits in the Qbits list.
 
     def simulation_1(self):
