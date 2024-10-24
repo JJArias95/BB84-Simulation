@@ -18,5 +18,5 @@ Two list of random bases, referred to as the "AliceBases" and "BobBases", of len
 Using a one-to-one relationship of each element, the "RawKey" list is encoded into Qbits using the "AliceBases" list. This generates a "Qbits" list of length "NumBitsSim1", which presents a distribution of 25% of each combination of Qbit. This process is realized for "NumSimSim1" simulations. In each simulation, the Qbit at each position of the "Qbits" list is checked. This process results in a histogram of Qbits for each position in the "Qbits" list, obtained after performing all "NumSimSim1" simulations.
 
 ## Simulation 2
-It is a simulation of the Qber and Ber of a BB84 protocol. The BB84 protocol is simulated "NumSimSim2" times. In each simulation, the raw key length is change from 90 to "NumBitsMax" in order to obatin the depedency of the Qber and Ber into the raw key length.
+It is a simulation of the Qber and Ber of a BB84 protocol with a $\lambda$ probability of a eavesdropper in the communication. The BB84 protocol is simulated "NumSimSim2" times. In each simulation, the raw key length is change from 90 to "NumBitsMax" in order to obatin the depedency of the Qber and Ber into the raw key length.
 
